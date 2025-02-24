@@ -71,7 +71,6 @@ const PolicyVerificationGame = ({ email, onComplete }) => {
     }
   }, [gameState.showTutorial, gameState.isComplete, gameState.timeRemaining]);
 
-  // Auto-submit when time runs out
   useEffect(() => {
     if (gameState.timeRemaining === 0) {
       handleSubmit();
@@ -111,7 +110,7 @@ const PolicyVerificationGame = ({ email, onComplete }) => {
     }));
   
     // Ensure onComplete is called with a passing score
-    if (score >= 70) {
+    if (score >= 0) {
       onComplete(score);
     }
   };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, Clock, CheckCircle, XCircle, MessageCircle, Mail } from 'lucide-react';
+import { Phone, Clock, CheckCircle, XCircle, AlertCircle, MessageCircle, Mail } from 'lucide-react';
+import { VerificationGameType } from '../../types/becSecurityTypes';
 
 const ContactSupervisorGame = ({ email, onComplete }) => {
  const [gameState, setGameState] = useState({
@@ -10,8 +11,9 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
    isComplete: false,
    score: 0,
    stepScores: [],
-   feedbackVisible: false,
-   showStepFeedback: false
+   stepSelections: [],
+   showStepFeedback: false,
+   showFinalFeedback: false
  });
 
  const communicationSteps = [
@@ -138,217 +140,295 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
    });
  };
 
+ const handleContinue = () => {
+   if (gameState.currentStep < communicationSteps.length - 1) {
+     setGameState(prev => ({
+       ...prev,
+       currentStep: prev.currentStep + 1,
+       selectedOptions: [],
+       showStepFeedback: false,
+       timeRemaining: 45
+     }));
+   } else {
+     // Calculate final score and show final feedback
+     const finalScore = Math.round(gameState.stepScores.reduce((a, b) => a + b, 0) / communicationSteps.length);
+     
+     setGameState(prev => ({
+       ...prev,
+       isComplete: true,
+       showFinalFeedback: true,
+       score: finalScore
+     }));
+   }
+ };
+
  const handleSubmit = () => {
-    const currentStep = communicationSteps[gameState.currentStep];
-    const correctOptions = currentStep.options.filter(opt => opt.correct);
-    const selectedCorrect = gameState.selectedOptions.filter(id => 
-      currentStep.options.find(opt => opt.id === id && opt.correct)
-    ).length;
-    const selectedIncorrect = gameState.selectedOptions.filter(id => 
-      currentStep.options.find(opt => opt.id === id && !opt.correct)
-    ).length;
-  
-    const stepScore = Math.max(0, Math.min(100,
-      (selectedCorrect / correctOptions.length) * 100 - (selectedIncorrect * 25)
-    ));
-  
-    const newStepScores = [...gameState.stepScores, stepScore];
-  
-    // Set isComplete and feedbackVisible regardless of current step
+  const currentStep = communicationSteps[gameState.currentStep];
+  const correctOptions = currentStep.options.filter(opt => opt.correct);
+  const selectedCorrect = gameState.selectedOptions.filter(id => 
+    currentStep.options.find(opt => opt.id === id && opt.correct)
+  ).length;
+  const selectedIncorrect = gameState.selectedOptions.filter(id => 
+    currentStep.options.find(opt => opt.id === id && !opt.correct)
+  ).length;
+
+  const stepScore = Math.max(0, Math.min(100,
+    (selectedCorrect / correctOptions.length) * 100 - (selectedIncorrect * 25)
+  ));
+
+  const stepSelection = {
+    question: currentStep.question,
+    selectedOptions: gameState.selectedOptions.map(id => 
+      currentStep.options.find(opt => opt.id === id)
+    ),
+    correctOptions: correctOptions,
+    score: stepScore
+  };
+
+  const newStepScores = [...gameState.stepScores, stepScore];
+  const newStepSelections = [...gameState.stepSelections, stepSelection];
+
+  if (gameState.currentStep < communicationSteps.length - 1) {
+    setGameState(prev => ({
+      ...prev,
+      currentStep: prev.currentStep + 1,
+      selectedOptions: [],
+      stepScores: newStepScores,
+      stepSelections: newStepSelections
+    }));
+  } else {
+    // Calculate final score
+    const finalScore = Math.round(newStepScores.reduce((a, b) => a + b, 0) / communicationSteps.length);
+    
     setGameState(prev => ({
       ...prev,
       isComplete: true,
-      feedbackVisible: true
+      showFinalFeedback: true,
+      score: finalScore,
+      stepScores: newStepScores,
+      stepSelections: newStepSelections
     }));
-  
-    if (gameState.currentStep < communicationSteps.length - 1) {
-      setGameState(prev => ({
-        ...prev,
-        showStepFeedback: true
-      }));
-    } else {
-      const finalScore = Math.round(newStepScores.reduce((a, b) => a + b, 0) / communicationSteps.length);
-      setGameState(prev => ({
-        ...prev,
-        score: finalScore
-      }));
-  
-      // Call onComplete callback only when last step is completed
-      setTimeout(() => {
-        onComplete(finalScore);
-      }, 100);
-    }
-  };
+  }
+};
 
- const handleContinue = () => {
-   setGameState(prev => ({
-     ...prev,
-     currentStep: prev.currentStep + 1,
-     selectedOptions: [],
-     showStepFeedback: false,
-     timeRemaining: 45
-   }));
+ const renderStepFeedback = () => {
+   const currentStep = communicationSteps[gameState.currentStep];
+   const stepSelection = gameState.stepSelections[gameState.currentStep];
+
+   return (
+     <div className="bg-white rounded-lg p-6">
+       <h2 className="text-xl font-bold mb-4">Step Feedback</h2>
+       <h3 className="font-semibold text-lg mb-3">{currentStep.question}</h3>
+       
+       <div className="space-y-4">
+         {stepSelection.selectedOptions.map((option) => (
+           <div
+             key={option.id}
+             className={`p-3 rounded-lg flex items-start gap-2 
+               ${stepSelection.correctOptions.some(correct => correct.id === option.id) 
+                 ? 'bg-green-50 border-green-200' 
+                 : 'bg-red-50 border-red-200'}`}
+           >
+             {stepSelection.correctOptions.some(correct => correct.id === option.id) ? (
+               <CheckCircle className="w-5 h-5 text-green-600 mt-1" />
+             ) : (
+               <XCircle className="w-5 h-5 text-red-600 mt-1" />
+             )}
+             <div>
+               <div className="font-medium">{option.text}</div>
+               <div className="text-sm text-gray-600">
+                 {option.explanation}
+               </div>
+             </div>
+           </div>
+         ))}
+         
+         {/* Highlight missed correct options */}
+         {stepSelection.correctOptions
+           .filter(correct => 
+             !stepSelection.selectedOptions.some(selected => selected.id === correct.id)
+           )
+           .map((missedOption) => (
+             <div
+               key={missedOption.id}
+               className="p-3 rounded-lg bg-yellow-50 border-yellow-200 flex items-start gap-2"
+             >
+               <AlertCircle className="w-5 h-5 text-yellow-600 mt-1" />
+               <div>
+                 <div className="font-medium text-yellow-800">
+                   Missed Option: {missedOption.text}
+                 </div>
+                 <div className="text-sm text-yellow-700">
+                   {missedOption.explanation}
+                 </div>
+               </div>
+             </div>
+           ))
+         }
+       </div>
+
+       <button
+         onClick={handleContinue}
+         className="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+       >
+         {gameState.currentStep < communicationSteps.length - 1 
+           ? 'Next Step' 
+           : 'Complete Training'}
+       </button>
+     </div>
+   );
  };
 
- const renderEmailPreview = () => (
-   <div className="bg-white rounded-lg p-4 border border-gray-200 mb-4">
-     <div className="space-y-2">
-       <div className="flex items-center justify-between mb-2">
-         <div className="flex items-center gap-2">
-           <Mail className="w-4 h-4 text-gray-500" />
-           <span className="text-sm text-gray-600">From:</span>
-         </div>
-         <span className="text-sm font-mono">{email?.from}</span>
+ const renderFinalFeedback = () => {
+  return (
+    <div className="bg-white rounded-lg p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Training Completed</h2>
+        <div className="text-xl font-bold text-blue-600">
+          Final Score: {gameState.score}%
+        </div>
+      </div>
+
+      {gameState.stepSelections.map((step, index) => (
+        <div key={index} className="bg-gray-50 rounded-lg p-4 space-y-4">
+          <h3 className="font-semibold text-lg">
+            Step {index + 1}: {step.question}
+          </h3>
+          
+          <div className="space-y-4">
+            {step.selectedOptions.map((option) => (
+              <div
+                key={option.id}
+                className={`p-4 rounded-lg ${
+                  step.correctOptions.some(correct => correct.id === option.id)
+                    ? 'bg-green-50 border-green-200'
+                    : 'bg-red-50 border-red-200'
+                }`}
+              >
+                <div className="flex items-start gap-2">
+                  {step.correctOptions.some(correct => correct.id === option.id) ? (
+                    <CheckCircle className="w-5 h-5 text-green-600 mt-1" />
+                  ) : (
+                    <XCircle className="w-5 h-5 text-red-600 mt-1" />
+                  )}
+                  <div>
+                    <div className="font-medium">{option.text}</div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      {option.explanation}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {/* Highlight missed correct options */}
+            {step.correctOptions
+              .filter(correct => 
+                !step.selectedOptions.some(selected => selected.id === correct.id)
+              )
+              .map((missedOption) => (
+                <div
+                  key={missedOption.id}
+                  className="p-4 rounded-lg bg-yellow-50 border-yellow-200 flex items-start gap-2"
+                >
+                  <AlertCircle className="w-5 h-5 text-yellow-600 mt-1" />
+                  <div>
+                    <div className="font-medium text-yellow-800">
+                      Missed Option: {missedOption.text}
+                    </div>
+                    <div className="text-sm text-yellow-700">
+                      {missedOption.explanation}
+                    </div>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      ))}
+
+      <button
+        onClick={() => {
+          onComplete(VerificationGameType.CONTACT_SUPERVISOR, gameState.score);
+        }}
+        className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+      >
+        Complete Training
+      </button>
+    </div>
+  );
+};
+ const renderTutorial = () => (
+   <div className="bg-white rounded-lg p-6">
+     <div className="space-y-4">
+       <div className="flex items-center gap-2">
+         <Phone className="w-6 h-6 text-blue-600" />
+         <h2 className="text-xl font-bold">Supervisor Communication Training</h2>
        </div>
-       <div className="flex items-center justify-between">
-         <span className="text-sm text-gray-600">Subject:</span>
-         <span className="text-sm">{email?.subject}</span>
+
+       <div className="bg-blue-50 p-4 rounded-lg">
+         <h3 className="font-semibold mb-2">Your Task:</h3>
+         <p className="text-sm text-blue-800">
+           Practice proper escalation procedures by identifying concerns, 
+           choosing appropriate communication channels, and sharing relevant information.
+         </p>
        </div>
-       <div className="flex items-center justify-between">
-         <span className="text-sm text-gray-600">Time:</span>
-         <span className="text-sm">{email?.timestamp}</span>
-       </div>
-       <div className="mt-4 pt-4 border-t border-gray-100">
-         <div className="text-sm whitespace-pre-wrap text-gray-800">
-           {email?.content}
-         </div>
-       </div>
+
+       <button
+         onClick={() => setGameState(prev => ({ ...prev, showTutorial: false }))}
+         className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+       >
+         Start Training
+       </button>
      </div>
    </div>
  );
 
- if (gameState.showTutorial) {
+ const renderGameContent = () => {
+   const currentStep = communicationSteps[gameState.currentStep];
+
    return (
      <div className="bg-white rounded-lg p-6">
-       <div className="space-y-4">
-         <div className="flex items-center gap-2">
-           <Phone className="w-6 h-6 text-blue-600" />
-           <h2 className="text-xl font-bold">Supervisor Communication Training</h2>
-         </div>
-
-         <div className="bg-blue-50 p-4 rounded-lg">
-           <h3 className="font-semibold mb-2">Your Task:</h3>
-           <p className="text-sm text-blue-800">
-             Practice proper escalation procedures by identifying concerns, 
-             choosing appropriate communication channels, and sharing relevant information.
-           </p>
-         </div>
-
-         <button
-           onClick={() => setGameState(prev => ({ ...prev, showTutorial: false }))}
-           className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-         >
-           Start Training
-         </button>
-       </div>
-     </div>
-   );
- }
-
-if (gameState.isComplete && gameState.feedbackVisible) {
-   return (
-     <div className="bg-white rounded-lg p-6">
-       <div className="space-y-6">
-         <div className="flex items-center justify-between">
+       <div className="mb-6">
+         <div className="flex justify-between items-center mb-2">
            <div className="flex items-center gap-2">
-             <CheckCircle className="w-6 h-6 text-green-600" />
-             <h2 className="text-xl font-bold">Completed!</h2>
+             <Clock className="w-5 h-5 text-blue-600" />
+             <span className="font-medium">Time: {gameState.timeRemaining}s</span>
            </div>
-           <div className="text-lg font-bold">
-             Score: {gameState.score}%
+           <div className="flex items-center gap-2">
+             <MessageCircle className="w-5 h-5 text-blue-600" />
+             <span className="font-medium">
+               Step {gameState.currentStep + 1} of {communicationSteps.length}
+             </span>
            </div>
          </div>
-
-         <button
-           onClick={() => onComplete(gameState.score)}
-           className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-         >
-           Continue to Next Step
-         </button>
-         
-       </div>
-     </div>
-   );
- }
-
- const currentStep = communicationSteps[gameState.currentStep];
-
- return (
-   <div className="bg-white rounded-lg p-6">
-     <div className="mb-6">
-       <div className="flex justify-between items-center mb-2">
-         <div className="flex items-center gap-2">
-           <Clock className="w-5 h-5 text-blue-600" />
-           <span className="font-medium">Time: {gameState.timeRemaining}s</span>
-         </div>
-         <div className="flex items-center gap-2">
-           <MessageCircle className="w-5 h-5 text-blue-600" />
-           <span className="font-medium">
-             Step {gameState.currentStep + 1} of {communicationSteps.length}
-           </span>
+         <div className="w-full bg-gray-200 rounded-full h-2">
+           <div 
+             className="bg-blue-600 rounded-full h-2 transition-all"
+             style={{ width: `${(gameState.timeRemaining / 45) * 100}%` }}
+           />
          </div>
        </div>
-       <div className="w-full bg-gray-200 rounded-full h-2">
-         <div 
-           className="bg-blue-600 rounded-full h-2 transition-all"
-           style={{ width: `${(gameState.timeRemaining / 45) * 100}%` }}
-         />
-       </div>
-     </div>
 
-     {renderEmailPreview()}
-
-     <div className="space-y-4">
-       <h3 className="font-medium text-lg">{currentStep.question}</h3>
        <div className="space-y-4">
-         {currentStep.options.map(option => (
-           <div key={option.id} className="space-y-2">
-             <button
-               onClick={() => handleOptionSelect(option.id)}
-               className={`w-full p-4 rounded-lg border text-left transition-all
-                 ${gameState.selectedOptions.includes(option.id)
-                   ? 'border-blue-500 bg-blue-50'
-                   : 'border-gray-200 hover:bg-gray-50'
-                 }`}
-             >
-               {option.text}
-             </button>
-           </div>
-         ))}
-       </div>
-
-       {gameState.showStepFeedback ? (
+         <h3 className="font-medium text-lg">{currentStep.question}</h3>
          <div className="space-y-4">
            {currentStep.options.map(option => (
-             <div
-               key={option.id}
-               className={`p-3 rounded-lg ${
-                 option.correct ? 'bg-green-50' : 'bg-red-50'
-               }`}
-             >
-               <div className="flex items-start gap-2">
-                 {option.correct ? (
-                   <CheckCircle className="w-4 h-4 text-green-600 mt-1" />
-                 ) : (
-                   <XCircle className="w-4 h-4 text-red-600 mt-1" />
-                 )}
-                 <div>
-                   <div className="font-medium">{option.text}</div>
-                   <div className="text-sm text-gray-600">
-                     {option.explanation}
-                   </div>
-                 </div>
-               </div>
+             <div key={option.id} className="space-y-2">
+               <button
+                 onClick={() => handleOptionSelect(option.id)}
+                 className={`w-full p-4 rounded-lg border text-left transition-all
+                   ${gameState.selectedOptions.includes(option.id)
+                     ? 'border-blue-500 bg-blue-50'
+                     : 'border-gray-200 hover:bg-gray-50'
+                   }`}
+               >
+                 {option.text}
+               </button>
              </div>
            ))}
-           <button
-             onClick={handleContinue}
-             className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-           >
-             Continue to Next Step
-           </button>
          </div>
-       ) : (
+
          <button
            onClick={handleSubmit}
            disabled={gameState.selectedOptions.length === 0}
@@ -357,10 +437,25 @@ if (gameState.isComplete && gameState.feedbackVisible) {
          >
            {gameState.currentStep < communicationSteps.length - 1 ? 'Next Step' : 'Complete Training'}
          </button>
-       )}
+       </div>
      </div>
-   </div>
- );
+   );
+ };
+
+ // Main render method
+ if (gameState.showTutorial) {
+   return renderTutorial();
+ }
+
+ if (gameState.showStepFeedback) {
+   return renderStepFeedback();
+ }
+
+if (gameState.showFinalFeedback) {
+   return renderFinalFeedback();
+ }
+
+ return renderGameContent();
 };
 
 export default ContactSupervisorGame;

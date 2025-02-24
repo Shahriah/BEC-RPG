@@ -7,7 +7,8 @@ import {
   Lock,
   Users,
   Key,
-  Trophy
+  Trophy,
+  Play
 } from 'lucide-react';
 
 import { scenarios } from '../../data/dataSecurityScenarios';
@@ -91,34 +92,86 @@ const DataSecurityGame = () => {
 
   // Tutorial Modal
   const renderTutorial = () => (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <h2 className="text-2xl font-bold mb-4">Welcome to Data Guardian</h2>
-        <div className="space-y-4">
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <h3 className="font-semibold mb-2">Your Mission:</h3>
-            <ul className="list-disc list-inside space-y-1 text-sm">
-              <li>Classify sensitive company data correctly</li>
-              <li>Determine appropriate access levels</li>
-              <li>Choose proper security measures</li>
-              <li>Protect company information assets</li>
-            </ul>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-4 overflow-hidden">
+        <div className="grid md:grid-cols-2">
+          {/* Left Side - Informative Content */}
+          <div className="bg-blue-600 text-white p-8 flex flex-col justify-center">
+            <div className="mb-6">
+              <Lock className="w-16 h-16 text-white mb-4" strokeWidth={1.5} />
+              <h2 className="text-3xl font-bold mb-4">Data Guardian</h2>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <Shield className="w-6 h-6 mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-lg">Data Protection Challenge</h3>
+                  <p className="text-sm text-blue-100">
+                    Develop critical skills in classifying, protecting, and managing sensitive organizational data.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <Users className="w-6 h-6 mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-lg">Real-World Scenarios</h3>
+                  <p className="text-sm text-blue-100">
+                    Experience authentic data security challenges across different organizational contexts.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <Key className="w-6 h-6 mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-lg">Continuous Learning</h3>
+                  <p className="text-sm text-blue-100">
+                    Gain insights into data classification, access control, and security best practices.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="bg-yellow-50 p-4 rounded-lg">
-            <h3 className="font-semibold mb-2">Remember:</h3>
-            <ul className="list-disc list-inside space-y-1 text-sm">
-              <li>Consider the sensitivity of information</li>
-              <li>Think about who needs access</li>
-              <li>Apply appropriate security controls</li>
-              <li>Follow data protection regulations</li>
-            </ul>
+          
+          {/* Right Side - Mission Details */}
+          <div className="p-8">
+            <div className="mb-6">
+              <h3 className="text-2xl font-bold mb-2">Your Mission</h3>
+              <p className="text-gray-600 mb-4">
+                Navigate complex data security scenarios to protect your organization's most valuable asset: information.
+              </p>
+              
+              <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4">
+                <h4 className="font-semibold mb-2">Mission Objectives</h4>
+                <ul className="list-disc list-inside space-y-2 text-sm text-gray-700">
+                  <li>Classify sensitive company data correctly</li>
+                  <li>Determine appropriate access levels</li>
+                  <li>Choose proper security measures</li>
+                  <li>Protect company information assets</li>
+                </ul>
+              </div>
+              
+              <div className="bg-green-50 border-l-4 border-green-500 p-4">
+                <h4 className="font-semibold mb-2">Key Skills You'll Develop</h4>
+                <ul className="list-disc list-inside space-y-2 text-sm text-gray-700">
+                  <li>Data classification techniques</li>
+                  <li>Access control principles</li>
+                  <li>Security risk assessment</li>
+                  <li>Compliance and protection strategies</li>
+                </ul>
+              </div>
+            </div>
+            
+            <button
+              onClick={() => setShowTutorial(false)}
+              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+            >
+              <Play className="w-5 h-5" />
+              Begin Data Security Investigation
+            </button>
           </div>
-          <button
-            onClick={() => setShowTutorial(false)}
-            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            Start Mission
-          </button>
         </div>
       </div>
     </div>

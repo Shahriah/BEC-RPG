@@ -18,15 +18,20 @@ const MiniGameManager = ({ email, onComplete }) => {
       ...gameState.scores,
       [gameType]: score
     };
-
-    setGameState(prev => ({
-      ...prev,
-      scores: newScores,
-      showTransition: true
-    }));
-
+  
     if (gameType === VerificationGameType.CONTACT_SUPERVISOR) {
-      onComplete(gameType, score);
+      // Calculate total score across all verification games
+      const totalScore = Math.round(Object.values(newScores).reduce((sum, s) => sum + s, 0) / 3);
+      
+      // Only call onComplete once for the final game
+      onComplete(gameType, totalScore);
+    } else {
+      // For other games, update scores and show transition
+      setGameState(prev => ({
+        ...prev,
+        scores: newScores,
+        showTransition: true
+      }));
     }
   };
 
@@ -45,7 +50,7 @@ const MiniGameManager = ({ email, onComplete }) => {
       showTransition: false
     }));
   };
-
+  
   const renderTransitionScreen = () => {
     const currentStep = VerificationSteps[gameState.currentStep];
     const nextStep = VerificationSteps[

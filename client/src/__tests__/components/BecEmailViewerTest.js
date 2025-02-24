@@ -1,0 +1,266 @@
+// EmailActionFeedback.test.jsx
+import React from 'react';
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { EmailViewer, ActionPanel, FeedbackPanel } from '../../components/bec-security/BecEmailViewer'; // adjust the path accordingly
+
+// Mock the external security types with dummy data
+jest.mock('../../types/becSecurityTypes', () => ({
+  RedFlags: {},
+  SecurityBehaviors: {
+    VERIFICATION_REQUESTED: { points: 10 },
+    PROCEDURE_FOLLOWED: { points: 20 },
+  },
+  VerificationSteps: {
+    step1: { label: 'Verify Sender', timeRequired: 5, points: 5 },
+    step2: { label: 'Check Link', timeRequired: 10, points: 10 },
+  },
+}));
+
+afterEach(cleanup);
+
+describe('EmailViewer Component', () => {
+  test('renders nothing when no email is provided', () => {
+    const { container } = render(<EmailViewer />);
+    expect(container.firstChild).toBeNull();
+  });
+
+  test('renders email details correctly', () => {
+    const email = {
+      emailContent: {
+        from: 'alice@example.com',
+        subject: 'Test Subject',
+        timestamp: '2025-02-23 12:34',
+        content: 'This is a test email content.'
+      }
+    };
+
+    render(<EmailViewer email={email} />);
+    expect(screen.getByText(/From: alice@example.com/i)).toBeInTheDocument();
+    expect(screen.getByText(/Subject: Test Subject/i)).toBeInTheDocument();
+    expect(screen.getByText(/2025-02-23 12:34/i)).toBeInTheDocument();
+    expect(screen.getByText(/This is a test email content./i)).toBeInTheDocument();
+  });
+});
+
+describe('ActionPanel Component', () => {
+  test('renders main action buttons and calls onAction with correct values', () => {
+    const onAction = jest.fn();
+    const onVerify = jest.fn();
+    render(
+      <ActionPanel
+        onAction={onAction}
+        onVerify={onVerify}
+        verificationSteps={[]}
+        disabled={false}
+      />
+    );
+
+    const flagButton = screen.getByText(/Flag as Suspicious/i);
+    const processButton = screen.getByText(/Process Request/i);
+    expect(flagButton).toBeInTheDocument();
+    expect(processButton).toBeInTheDocument();
+
+    fireEvent.click(flagButton);
+    expect(onAction).toHaveBeenCalledWith('flag');
+
+    fireEvent.click(processButton);
+    expect(onAction).toHaveBeenCalledWith('process');
+  });
+
+  test('renders verification steps and calls onVerify when clicked', () => {
+    const onAction = jest.fn();
+    const onVerify = jest.fn();
+    render(
+      <ActionPanel
+        onAction={onAction}
+        onVerify={onVerify}
+        verificationSteps={[]}
+        disabled={false}
+      />
+    );
+
+    // Our dummy VerificationSteps include "Verify Sender" (step1) and "Check Link" (step2)
+    const verifySenderButton = screen.getByText(/Verify Sender/i);
+    const checkLinkButton = screen.getByText(/Check Link/i);
+    expect(verifySenderButton).toBeInTheDocument();
+    expect(checkLinkButton).toBeInTheDocument();
+
+    fireEvent.click(verifySenderButton);
+    expect(onVerify).toHaveBeenCalledWith('step1');
+
+    fireEvent.click(checkLinkButton);
+    expect(onVerify).toHaveBeenCalledWith('step2');
+  });
+
+  test('disables verification step buttons if already verified or panel is disabled', () => {
+    const onAction = jest.fn();
+    const onVerify = jest.fn();
+    // Render with one step already verified (step1)
+    const { rerender } = render(
+      <ActionPanel
+        onAction={onAction}
+        onVerify={onVerify}
+        verificationSteps={['step1']}
+        disabled={false}
+      />
+    );
+    // Use getByRole to select the actual button element by its accessible name.
+    const verifySenderButton = screen.getByRole('button', { name: /Verify Sender/i });
+    const checkLinkButton = screen.getByRole('button', { name: /Check Link/i });
+  
+    // The step already taken should be disabled
+    expect(verifySenderButton).toBeDisabled();
+    // The other step should be enabled
+    expect(checkLinkButton).not.toBeDisabled();
+  
+    // Now, render with the entire panel disabled
+    rerender(
+      <ActionPanel
+        onAction={onAction}
+        onVerify={onVerify}
+        verificationSteps={[]}
+        disabled={true}
+      />
+    );
+    const flagButton = screen.getByRole('button', { name: /Flag as Suspicious/i });
+    const processButton = screen.getByRole('button', { name: /Process Request/i });
+    expect(flagButton).toBeDisabled();
+    expect(processButton).toBeDisabled();
+  });
+  
+});
+
+describe('FeedbackPanel Component', () => {
+  const dummyEmail = {
+    fraudType: 'phishing',
+    securityProtocol: "Please verify the sender's email domain.",
+    learningPoints: [
+      'Always check the sender\'s email address.',
+      'Do not click on suspicious links.'
+    ]
+  };
+
+  test('displays correct header and analysis for a correct response', () => {
+    const onContinue = jest.fn();
+    render(
+      <FeedbackPanel
+        email={dummyEmail}
+        verificationSteps={['step1', 'step2']}
+        expectedSteps={['step1', 'step2']}
+        isCorrect={true}
+        onContinue={onContinue}
+      />
+    );
+
+    // Header for a correct response
+    expect(screen.getByText(/Correct Response!/i)).toBeInTheDocument();
+    // Analysis should mention the fraud type if provided
+    expect(screen.getByText(/This was a phishing attempt\./i)).toBeInTheDocument();
+    // Security protocol should be displayed
+    expect(screen.getByText(/Please verify the sender's email domain\./i)).toBeInTheDocument();
+  });
+
+  test('displays correct header and analysis for an incorrect response', () => {
+    const onContinue = jest.fn();
+    // Use an email without a fraudType so it is treated as legitimate
+    const legitEmail = {
+      securityProtocol: 'This is a normal request.',
+      learningPoints: ['Check for authenticity.']
+    };
+
+    render(
+      <FeedbackPanel
+        email={legitEmail}
+        verificationSteps={[]}
+        expectedSteps={['step1', 'step2']}
+        isCorrect={false}
+        onContinue={onContinue}
+      />
+    );
+
+    expect(screen.getByText(/Incorrect Response/i)).toBeInTheDocument();
+    // Analysis should indicate a legitimate request when no fraudType is provided
+    expect(screen.getByText(/This was a legitimate request\./i)).toBeInTheDocument();
+  });
+
+  test('renders verification steps review with correct status icons', () => {
+    const onContinue = jest.fn();
+    render(
+      <FeedbackPanel
+        email={dummyEmail}
+        verificationSteps={['step1']} // only step1 taken
+        expectedSteps={['step1', 'step2']}
+        isCorrect={false}
+        onContinue={onContinue}
+      />
+    );
+
+    // Both expected verification steps should be listed
+    expect(screen.getByText(/Verify Sender/i)).toBeInTheDocument();
+    expect(screen.getByText(/Check Link/i)).toBeInTheDocument();
+    // Although we can’t directly check the rendered SVG icons, the presence of the step labels verifies that the list is rendered.
+  });
+
+  test('calculates score correctly for complete verification', () => {
+    const onContinue = jest.fn();
+    // For complete verification:
+    // expectedSteps: ['step1', 'step2']
+    // Dummy VerificationSteps gives: step1 = 5 points, step2 = 10 points.
+    // Also, if any verification is performed, add VERIFICATION_REQUESTED (10 points).
+    // And if all expected steps are taken, add PROCEDURE_FOLLOWED (20 points).
+    // Total score = 5 + 10 + 10 + 20 = 45.
+    render(
+      <FeedbackPanel
+        email={dummyEmail}
+        verificationSteps={['step1', 'step2']}
+        expectedSteps={['step1', 'step2']}
+        isCorrect={true}
+        onContinue={onContinue}
+      />
+    );
+    expect(screen.getByText('45')).toBeInTheDocument();
+  });
+
+  test('calculates score correctly for partial verification', () => {
+    const onContinue = jest.fn();
+    // For partial verification:
+    // expectedSteps: ['step1', 'step2']
+    // Only step1 is taken: step1 = 5 points.
+    // Also, VERIFICATION_REQUESTED (10 points) is added.
+    // PROCEDURE_FOLLOWED is not added because not all steps were taken.
+    // Total score = 5 + 10 = 15.
+    render(
+      <FeedbackPanel
+        email={dummyEmail}
+        verificationSteps={['step1']}
+        expectedSteps={['step1', 'step2']}
+        isCorrect={true}
+        onContinue={onContinue}
+      />
+    );
+    expect(screen.getByText('15')).toBeInTheDocument();
+  });
+
+  test('renders learning points and calls onContinue when Continue is clicked', () => {
+    const onContinue = jest.fn();
+    render(
+      <FeedbackPanel
+        email={dummyEmail}
+        verificationSteps={['step1']}
+        expectedSteps={['step1', 'step2']}
+        isCorrect={false}
+        onContinue={onContinue}
+      />
+    );
+
+    // Learning points should be rendered
+    dummyEmail.learningPoints.forEach(point => {
+      expect(screen.getByText(point)).toBeInTheDocument();
+    });
+
+    // Clicking the Continue button should trigger the onContinue callback
+    const continueButton = screen.getByText(/Continue/i);
+    fireEvent.click(continueButton);
+    expect(onContinue).toHaveBeenCalled();
+  });
+});

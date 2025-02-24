@@ -1,7 +1,7 @@
 // components/games/EmailGame.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Mail, Info, ArrowLeft, Check, X, Trophy } from 'lucide-react';
+import { Mail, Info, ArrowLeft, Check, X, Trophy, Shield, AlertTriangle, Play } from 'lucide-react';
 import InteractiveEmail from './InteractiveEmail';
 import { EmailScenarios } from '../../data/emailScenarios';
 
@@ -21,6 +21,8 @@ const EmailGame = () => {
   const [showOptions, setShowOptions] = useState(false);
   const [analysisScore, setAnalysisScore] = useState(0);
   const [selectedFlags, setSelectedFlags] = useState([]);
+  const [showTutorial, setShowTutorial] = useState(true);
+
 
 
   // Get scenarios for the selected role
@@ -151,6 +153,91 @@ const EmailGame = () => {
       </div>
     );
   };
+  const renderTutorial = () => (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-4 overflow-hidden">
+        <div className="grid md:grid-cols-2">
+          {/* Left Side - Informative Content */}
+          <div className="bg-blue-600 text-white p-8 flex flex-col justify-center">
+            <div className="mb-6">
+              <Mail className="w-16 h-16 text-white mb-4" strokeWidth={1.5} />
+              <h2 className="text-3xl font-bold mb-4">Email Security Simulator</h2>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <Shield className="w-6 h-6 mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-lg">Cybersecurity Challenge</h3>
+                  <p className="text-sm text-blue-100">
+                    Develop critical skills in identifying and mitigating Business Email Compromise (BEC) threats.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-6 h-6 mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-lg">Real-World Scenarios</h3>
+                  <p className="text-sm text-blue-100">
+                    Experience authentic email security challenges from different organizational roles.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <Info className="w-6 h-6 mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-lg">Continuous Learning</h3>
+                  <p className="text-sm text-blue-100">
+                    Gain insights into email threat detection, social engineering, and security best practices.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Right Side - Role and Mission Details */}
+          <div className="p-8">
+            <div className="mb-6">
+              <h3 className="text-2xl font-bold mb-2">Your Mission: {roleName}</h3>
+              <p className="text-gray-600 mb-4">
+                As a {roleName}, you are tasked with identifying and responding to potential Business Email Compromise (BEC) threats.
+              </p>
+              
+              <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4">
+                <h4 className="font-semibold mb-2">Mission Objectives</h4>
+                <ul className="list-disc list-inside space-y-2 text-sm text-gray-700">
+                  <li>Analyze email content for suspicious elements</li>
+                  <li>Identify social engineering tactics</li>
+                  <li>Protect organizational communication channels</li>
+                  <li>Make informed security decisions quickly</li>
+                </ul>
+              </div>
+              
+              <div className="bg-green-50 border-l-4 border-green-500 p-4">
+                <h4 className="font-semibold mb-2">Key Skills You'll Develop</h4>
+                <ul className="list-disc list-inside space-y-2 text-sm text-gray-700">
+                  <li>Threat detection</li>
+                  <li>Critical email analysis</li>
+                  <li>Incident response</li>
+                  <li>Social engineering awareness</li>
+                </ul>
+              </div>
+            </div>
+            
+            <button
+              onClick={() => setShowTutorial(false)}
+              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+            >
+              <Play className="w-5 h-5" />
+              Begin Email Security Investigation
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   if (!currentScenario) {
     return null;
@@ -167,6 +254,8 @@ const EmailGame = () => {
           <ArrowLeft className="w-4 h-4" />
           Back to Missions
         </button>
+        {showTutorial && renderTutorial()}
+
   
         {/* Header */}
         <div className="bg-white rounded-lg shadow-lg p-4">

@@ -5,7 +5,7 @@ import Header from './Header';
 import ProgressCard from './ProgressCard';
 import MissionCard from './MissionCard';
 import AchievementBanner from './AchievementBanner';
-import { Mail, Users, Building2, Shield, ScrollText } from 'lucide-react';
+import { Mail, Users, Shield, ScrollText } from 'lucide-react';
 import { Roles } from '../types/roleTypes';
 
 const Dashboard = () => {
@@ -13,7 +13,8 @@ const Dashboard = () => {
     const [userData, setUserData] = useState({
         totalPoints: 0,
         rank: 'Rookie',
-        missions: []
+        missions: [],
+        achievements: []
     });
     const [selectedRole, setSelectedRole] = useState(() => {
         const savedRole = localStorage.getItem('selectedRole');
@@ -21,60 +22,56 @@ const Dashboard = () => {
     });
     const [isLoading, setIsLoading] = useState(true);
 
-    // In Dashboard.jsx, update the missions array:
-
-const missions = [
-    { 
-      id: 'email-urgency',
-      title: "Mission 1: Email Urgency Detection", 
-      description: "Master the art of spotting urgent email traps and identifying phishing attempts",
-      icon: Mail, 
-      completed: userData.missions?.some(m => m.missionId === 'email-urgency' && m.completed) || false,
-      score: userData.missions?.find(m => m.missionId === 'email-urgency')?.score || 0,
-      achievement: "Speed Detective",
-      difficulty: "Beginner",
-      path: "/game/email",
-      locked: false
-    },
-    { 
-      id: 'insider-threat',
-      title: "Mission 2: Insider Threat Detection", 
-      description: "Learn to identify suspicious behavior patterns and protect against internal security risks",
-      icon: Users, 
-      completed: userData.missions?.some(m => m.missionId === 'insider-threat' && m.completed) || false,
-      score: userData.missions?.find(m => m.missionId === 'insider-threat')?.score || 0,
-      achievement: "Behavior Guardian",
-      difficulty: "Intermediate",
-      path: "/game/insider-threat",
-      // Lock this mission if the first mission isn't completed
-      locked: !userData.missions?.some(m => m.missionId === 'email-urgency' && m.completed)
-    },
-    {
-        id: 'bec-security',
-        title: "Mission 3: Business Email Security",
-        description: "Learn to protect against Business Email Compromise (BEC) attacks and validate business communications",
-        icon: ScrollText, // Changed from FileText to ScrollText
-        completed: userData.missions?.some(m => m.missionId === 'bec-security' && m.completed) || false,
-        score: userData.missions?.find(m => m.missionId === 'bec-security')?.score || 0,
-        achievement: "Email Guardian",
-        difficulty: "Advanced",
-        path: "/game/bec-security",
-        locked: !userData.missions?.some(m => m.missionId === 'insider-threat' && m.completed)
-      },
-    {
-      id: 'data-security',
-      title: "Mission 4: Data Security Protocol",
-      description: "Learn to protect sensitive company information from social engineering attacks",
-      icon: Shield,
-      completed: userData.missions?.some(m => m.missionId === 'data-security' && m.completed) || false,
-      score: userData.missions?.find(m => m.missionId === 'data-security')?.score || 0,
-      achievement: "Data Defender",
-      difficulty: "Expert",
-      path: "/game/data-security",
-      // Lock this mission if the third mission isn't completed
-      locked: !userData.missions?.some(m => m.missionId === 'bec-security' && m.completed)
-    }
-  ];
+    const missions = [
+        { 
+          id: 'email-urgency',
+          title: "Mission 1: Email Urgency Detection", 
+          description: "Master the art of spotting urgent email traps and identifying phishing attempts",
+          icon: Mail, 
+          completed: userData.missions?.some(m => m.missionId === 'email-urgency' && m.completed) || false,
+          score: userData.missions?.find(m => m.missionId === 'email-urgency')?.score || 0,
+          achievement: "Speed Detective",
+          difficulty: "Beginner",
+          path: "/game/email",
+          locked: false
+        },
+        { 
+          id: 'insider-threat',
+          title: "Mission 2: Insider Threat Detection", 
+          description: "Learn to identify suspicious behavior patterns and protect against internal security risks",
+          icon: Users, 
+          completed: userData.missions?.some(m => m.missionId === 'insider-threat' && m.completed) || false,
+          score: userData.missions?.find(m => m.missionId === 'insider-threat')?.score || 0,
+          achievement: "Behavior Guardian",
+          difficulty: "Intermediate",
+          path: "/game/insider-threat",
+          locked: !userData.missions?.some(m => m.missionId === 'email-urgency' && m.completed)
+        },
+        {
+            id: 'bec-security',
+            title: "Mission 3: Business Email Security",
+            description: "Learn to protect against Business Email Compromise (BEC) attacks and validate business communications",
+            icon: ScrollText,
+            completed: userData.missions?.some(m => m.missionId === 'bec-security' && m.completed) || false,
+            score: userData.missions?.find(m => m.missionId === 'bec-security')?.score || 0,
+            achievement: "Email Guardian",
+            difficulty: "Advanced",
+            path: "/game/bec-security",
+            locked: !userData.missions?.some(m => m.missionId === 'insider-threat' && m.completed)
+        },
+        {
+          id: 'data-security',
+          title: "Mission 4: Data Security Protocol",
+          description: "Learn to protect sensitive company information from social engineering attacks",
+          icon: Shield,
+          completed: userData.missions?.some(m => m.missionId === 'data-security' && m.completed) || false,
+          score: userData.missions?.find(m => m.missionId === 'data-security')?.score || 0,
+          achievement: "Data Defender",
+          difficulty: "Expert",
+          path: "/game/data-security",
+          locked: !userData.missions?.some(m => m.missionId === 'bec-security' && m.completed)
+        }
+    ];
 
     // Fetch user data
     useEffect(() => {
@@ -127,6 +124,7 @@ const missions = [
 
     return (
         <div className="min-h-screen bg-slate-100">
+            {/* Render Header directly; the mock Header returns its own data-testid */}
             <Header
                 completedMissions={completedMissions}
                 totalMissions={missions.length}
@@ -149,16 +147,15 @@ const missions = [
                                     key={role.id}
                                     onClick={() => handleRoleSelect(role)}
                                     className={`
-                    w-full p-3 rounded-lg text-left transition-all duration-200
-                    ${selectedRole?.id === role.id
+                                        w-full p-3 rounded-lg text-left transition-all duration-200
+                                        ${selectedRole?.id === role.id
                                             ? 'bg-blue-50 border-2 border-blue-500 text-blue-700'
                                             : 'bg-white border border-gray-200 hover:border-blue-300 text-gray-700'
                                         }
-                  `}
+                                    `}
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className={`p-2 rounded-lg ${selectedRole?.id === role.id ? 'bg-blue-100' : 'bg-gray-100'
-                                            }`}>
+                                        <div className={`p-2 rounded-lg ${selectedRole?.id === role.id ? 'bg-blue-100' : 'bg-gray-100'}`}>
                                             <Icon className="w-4 h-4" />
                                         </div>
                                         <div>
@@ -171,7 +168,6 @@ const missions = [
                         })}
                     </div>
 
-                    {/* Current Role Details */}
                     {selectedRole && (
                         <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-lg">
                             <h3 className="text-sm font-medium text-blue-900 mb-2">Responsibilities:</h3>
@@ -186,7 +182,6 @@ const missions = [
                         </div>
                     )}
 
-                    {/* Role Selection Warning */}
                     {!selectedRole && (
                         <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                             <p className="text-xs text-yellow-700">
@@ -203,12 +198,11 @@ const missions = [
                         points={userData.totalPoints}
                     />
 
-
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {missions.map((mission) => (
                             <MissionCard
                                 key={mission.id}
-                                mission={mission}  // Remove the extra locked property here
+                                mission={mission}
                                 selectedRole={selectedRole}
                                 onStart={() => {
                                     if (!selectedRole) {
@@ -226,6 +220,7 @@ const missions = [
                         ))}
                     </div>
 
+                    {/* Render AchievementBanner directly; the mock returns its own data-testid */}
                     <AchievementBanner
                         achieved={userData.achievements?.length || 0}
                         total={5}
