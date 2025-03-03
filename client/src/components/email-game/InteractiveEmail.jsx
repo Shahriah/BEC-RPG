@@ -1,4 +1,4 @@
-// components/games/InteractiveEmail.jsx
+
 import React, { useState } from 'react';
 import { AlertCircle, CheckCircle, HelpCircle } from 'lucide-react';
 
@@ -11,7 +11,7 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
   const identifyRedFlags = (email) => {
     const redFlags = new Map();
 
-    // Domain check
+    
     if (!email.from.endsWith('@company.com')) {
       redFlags.set('domain', {
         text: email.from,
@@ -20,7 +20,7 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
       });
     }
 
-    // Urgency indicators
+    
     const urgencyWords = ['urgent', 'asap', 'immediately', 'today', 'quick'];
     urgencyWords.forEach(word => {
       if (email.content.toLowerCase().includes(word)) {
@@ -32,7 +32,7 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
       }
     });
 
-    // Financial triggers
+    
     const moneyPattern = /\$[\d,]+(\.\d{2})?/g;
     const moneyMatches = email.content.match(moneyPattern);
     if (moneyMatches) {
@@ -43,7 +43,7 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
       });
     }
 
-    // Secrecy/limitation phrases
+    
     const secrecyPhrases = [
       'confidential',
       'don\'t discuss',
@@ -61,7 +61,7 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
       }
     });
 
-    // Account/banking changes
+    
     const bankingPhrases = [
       'new account',
       'update bank',

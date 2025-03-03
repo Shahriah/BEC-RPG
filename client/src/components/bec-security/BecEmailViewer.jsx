@@ -108,13 +108,13 @@ export const FeedbackPanel = ({
 }) => {
   const calculateScore = () => {
     let score = 0;
-    // Points for correct verification steps
+    
     expectedSteps.forEach(step => {
       if (verificationSteps.includes(step)) {
         score += VerificationSteps[step].points;
       }
     });
-    // Points for demonstrated behaviors
+    
     if (verificationSteps.length > 0) {
       score += SecurityBehaviors.VERIFICATION_REQUESTED.points;
     }

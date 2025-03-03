@@ -1,4 +1,4 @@
-// types/roleTypes.js
+
 import { Shield, Users, BadgeDollarSign, UserCog } from 'lucide-react';
 
 export const Roles = [

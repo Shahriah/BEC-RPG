@@ -1,14 +1,14 @@
-// src/__tests__/components/EmailGameTest.js
+
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import * as router from 'react-router-dom';
 import EmailGame from '../../components/email-game/EmailGame';
 
-// Mock fetch globally
+
 global.fetch = jest.fn();
 
-// Mock router hooks
+
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: jest.fn(),
@@ -16,7 +16,7 @@ jest.mock('react-router-dom', () => ({
   MemoryRouter: ({ children }) => <div>{children}</div>
 }));
 
-// Mock scenarios data
+
 jest.mock('../../data/emailScenarios', () => ({
   EmailScenarios: {
     ADMIN: [
@@ -39,7 +39,7 @@ jest.mock('../../data/emailScenarios', () => ({
   }
 }));
 
-// Mock InteractiveEmail component
+
 jest.mock('../../components/email-game/InteractiveEmail', () => {
   return function MockInteractiveEmail({ onAnalysisComplete }) {
     return (
@@ -57,9 +57,9 @@ describe('EmailGame Component', () => {
   
   beforeEach(() => {
     jest.clearAllMocks();
-    // Reset fetch mock
+    
     global.fetch.mockReset();
-    // Setup default successful response
+    
     global.fetch.mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({
@@ -68,7 +68,7 @@ describe('EmailGame Component', () => {
         rank: 'Expert'
       })
     });
-    // Setup router mocks
+    
     router.useNavigate.mockImplementation(() => mockNavigate);
     router.useLocation.mockImplementation(() => ({
       state: { roleId: 'admin', roleName: 'Administrator' }
@@ -76,15 +76,15 @@ describe('EmailGame Component', () => {
   });
 
   const completeGameFlow = async () => {
-    // Dismiss tutorial
+    
     const beginButton = screen.getByText(/begin email security investigation/i);
     fireEvent.click(beginButton);
 
-    // First click "Submit Analysis"
+    
     const submitButton = screen.getByText('Submit Analysis');
     fireEvent.click(submitButton);
 
-    // Select correct option
+    
     await waitFor(() => {
       const option = screen.getByText('Option 1');
       fireEvent.click(option);
@@ -101,20 +101,20 @@ describe('EmailGame Component', () => {
     render(<EmailGame />);
     await completeGameFlow();
 
-    // Click complete mission
+    
     await waitFor(() => {
       const completeButton = screen.getByText('Complete Mission');
       fireEvent.click(completeButton);
     });
 
-    // Wait for completion modal
+    
     await waitFor(() => {
       expect(screen.getByText('Mission Complete!')).toBeInTheDocument();
       expect(screen.getByText(/Points Earned: 100/)).toBeInTheDocument();
     });
   });
 
-  // Update just the retry button test
+  
 test('shows try again button in completion modal', async () => {
     const mockReload = jest.fn();
     Object.defineProperty(window, 'location', {
@@ -125,15 +125,15 @@ test('shows try again button in completion modal', async () => {
     render(<EmailGame />);
     await completeGameFlow();
   
-    // Complete the mission
+    
     await waitFor(() => {
       const completeButton = screen.getByText('Complete Mission');
       fireEvent.click(completeButton);
     });
   
-    // Wait for modal and click retry
+    
     await waitFor(() => {
-      // Using exact text match to find the button
+      
       const retryButton = screen.getByText('Try Again', { exact: true });
       expect(retryButton).toBeInTheDocument();
       fireEvent.click(retryButton);
@@ -149,7 +149,7 @@ test('shows try again button in completion modal', async () => {
     render(<EmailGame />);
     await completeGameFlow();
 
-    // Verify error was logged
+    
     expect(consoleSpy).toHaveBeenCalledWith(
       'Error saving progress:',
       expect.any(Error)

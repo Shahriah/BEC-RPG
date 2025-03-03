@@ -1,4 +1,4 @@
-// src/__tests__/components/DataSecurityGameTest.js
+
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import DataSecurityGame from '../../components/data-security/DataSecurityGame';
@@ -11,7 +11,7 @@ jest.mock('react-router-dom', () => ({
   MemoryRouter: ({ children }) => <div>{children}</div>,
 }));
 
-// Mock child components to simplify testing.
+
 jest.mock('../../components/data-security/DataSecurityScenarioCard', () => ({
   ScenarioCard: ({ scenario }) => (
     <div data-testid="scenario-card">{scenario.question}</div>
@@ -34,7 +34,7 @@ jest.mock('../../components/data-security/DataSecurityScenarioCard', () => ({
   ),
 }));
 
-// Mock scenarios for predictable testing.
+
 jest.mock('../../data/dataSecurityScenarios', () => ({
   scenarios: [
     {
@@ -52,7 +52,7 @@ jest.mock('../../data/dataSecurityScenarios', () => ({
   ],
 }));
 
-// Mock security types.
+
 jest.mock('../../types/dataSecurityTypes', () => ({
   DataClassification: ['Option1', 'Option2'],
   AccessLevels: ['OptionA', 'OptionB'],
@@ -70,10 +70,10 @@ describe('DataSecurityGame Component', () => {
         <DataSecurityGame />
       </MemoryRouter>
     );
-    // Tutorial modal should be visible.
+    
     expect(screen.getByText('Begin Data Security Investigation')).toBeInTheDocument();
     expect(screen.getByText('Your Mission')).toBeInTheDocument();
-    // Use a more specific query to target the header h1 element.
+    
     expect(
       screen.getByRole('heading', { name: 'Data Guardian', level: 1 })
     ).toBeInTheDocument();

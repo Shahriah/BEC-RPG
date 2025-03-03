@@ -3,7 +3,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import CheckSenderGame from '../../components/bec-security/CheckSenderGame';
 
-// Mock Lucide icons
 jest.mock('lucide-react', () => ({
   Mail: jest.fn(() => <div data-testid="mail-icon" />),
   AlertTriangle: jest.fn(() => <div data-testid="alert-triangle-icon" />),
@@ -37,12 +36,10 @@ describe('CheckSenderGame Component', () => {
     jest.clearAllMocks();
   });
 
-  // Tutorial Rendering Tests
   describe('Tutorial Rendering', () => {
     test('renders tutorial initially', () => {
       renderComponent();
 
-      // Use getByRole for more reliable queries
       expect(
         screen.getByRole('heading', { name: /Sender Verification Training/i })
       ).toBeInTheDocument();
@@ -57,7 +54,6 @@ describe('CheckSenderGame Component', () => {
       const startButton = screen.getByRole('button', { name: /Start Training/i });
       fireEvent.click(startButton);
 
-      // Wait for game interface to appear (i.e. Submit Order button)
       await waitFor(() => {
         expect(
           screen.getByRole('button', { name: /Submit Order/i })
@@ -66,13 +62,11 @@ describe('CheckSenderGame Component', () => {
     });
   });
 
-  // Game Rendering Tests
   describe('Game Rendering', () => {
     beforeEach(async () => {
       renderComponent();
       const startButton = screen.getByRole('button', { name: /Start Training/i });
       fireEvent.click(startButton);
-      // Wait until the Submit Order button appears (i.e. game interface is loaded)
       await waitFor(() =>
         expect(
           screen.getByRole('button', { name: /Submit Order/i })
@@ -102,7 +96,6 @@ describe('CheckSenderGame Component', () => {
     });
   });
 
-  // Drag and Drop Interaction Tests
   describe('Step Reordering', () => {
     beforeEach(async () => {
       renderComponent();
@@ -116,42 +109,34 @@ describe('CheckSenderGame Component', () => {
     });
 
     test('allows selecting and reordering steps', () => {
-      // Find all step number elements using a custom text matcher that checks for digits followed by a period.
       const stepNumbers = screen.getAllByText((content) =>
         /^\d+\.$/.test(content)
       );
       
-      // Simulate drag start on the first step and drop on the last step.
       fireEvent.dragStart(stepNumbers[0]);
       fireEvent.drop(stepNumbers[stepNumbers.length - 1]);
 
-      // Click the Submit Order button
       const submitButton = screen.getByRole('button', { name: /Submit Order/i });
       fireEvent.click(submitButton);
 
-      // Verify that the onComplete callback was called with a score (a number)
       expect(mockOnComplete).toHaveBeenCalledWith(expect.any(Number));
     });
   });
 
-  // Completion Screen Tests
-// ...other tests remain unchanged
+
 
 describe('Completion Screen', () => {
     beforeEach(async () => {
       renderComponent();
       const startButton = screen.getByRole('button', { name: /Start Training/i });
       fireEvent.click(startButton);
-      // Wait until game interface loads
       await waitFor(() =>
         expect(screen.getByRole('button', { name: /Submit Order/i })).toBeInTheDocument()
       );
-      // For high score tests, we can submit immediately.
-      // For low score tests, we’ll simulate a reorder.
+
     });
   
     test('renders completion screen', async () => {
-      // Submit order without reordering (high score path)
       const submitButton = screen.getByRole('button', { name: /Submit Order/i });
       fireEvent.click(submitButton);
   
@@ -173,8 +158,6 @@ describe('Completion Screen', () => {
     });
   
     test('allows trying again on low score', async () => {
-      // Force a low score by reordering steps incorrectly.
-      // Instead of using the step number elements, we target the full draggable containers.
       const firstStepContainer = screen
         .getByText('Verify Email Domain')
         .closest('[draggable="true"]');
@@ -182,7 +165,6 @@ describe('Completion Screen', () => {
         .getByText('Review Security Policy')
         .closest('[draggable="true"]');
   
-      // Simulate the drag-and-drop events.
       fireEvent.dragStart(firstStepContainer, {
         dataTransfer: { setData: jest.fn(), getData: jest.fn() }
       });
@@ -191,24 +173,20 @@ describe('Completion Screen', () => {
         dataTransfer: { getData: jest.fn() }
       });
   
-      // Submit the order, which should yield a lower score.
       const submitButton = screen.getByRole('button', { name: /Submit Order/i });
       fireEvent.click(submitButton);
   
-      // Wait for the Try Again button to appear (low score path)
       await waitFor(() => {
         expect(screen.getByRole('button', { name: /Try Again/i })).toBeInTheDocument();
       });
       const tryAgainButton = screen.getByRole('button', { name: /Try Again/i });
       fireEvent.click(tryAgainButton);
   
-      // After trying again, the game interface should be visible again.
       expect(screen.getByRole('button', { name: /Submit Order/i })).toBeInTheDocument();
     });
   });
   
 
-  // Error Handling Tests
   describe('Error Handling', () => {
     test('renders error state when no email is provided', () => {
       renderComponent({ email: null });

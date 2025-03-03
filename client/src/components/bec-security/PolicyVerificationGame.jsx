@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Shield, Clock, CheckCircle, XCircle, AlertTriangle, Info, Mail } from 'lucide-react';
 
 const PolicyVerificationGame = ({ email, onComplete }) => {
-  // Game states
+  
   const [gameState, setGameState] = useState({
     showTutorial: true,
     selectedPolicies: new Set(),
@@ -11,7 +11,7 @@ const PolicyVerificationGame = ({ email, onComplete }) => {
     score: 0
   });
 
-  // Policies relevant to email security
+  
   const policies = [
     {
       id: 'fin-approval',
@@ -57,7 +57,7 @@ const PolicyVerificationGame = ({ email, onComplete }) => {
     }
   ];
 
-  // Timer effect
+  
   useEffect(() => {
     if (!gameState.showTutorial && !gameState.isComplete && gameState.timeRemaining > 0) {
       const timer = setInterval(() => {
@@ -109,7 +109,7 @@ const PolicyVerificationGame = ({ email, onComplete }) => {
       score
     }));
   
-    // Ensure onComplete is called with a passing score
+    
     if (score >= 0) {
       onComplete(score);
     }
@@ -142,7 +142,7 @@ const PolicyVerificationGame = ({ email, onComplete }) => {
     </div>
   );
 
-  // Tutorial view
+  
   if (gameState.showTutorial) {
     return (
       <div className="bg-white rounded-lg p-6">
@@ -180,7 +180,7 @@ const PolicyVerificationGame = ({ email, onComplete }) => {
     );
   }
 
-  // Game completion view
+  
   if (gameState.isComplete) {
     return (
       <div className="bg-white rounded-lg p-6">
@@ -256,7 +256,7 @@ const PolicyVerificationGame = ({ email, onComplete }) => {
     );
   }
 
-  // Main game view
+  
   return (
     <div className="bg-white rounded-lg p-6">
       {/* Timer and Progress */}

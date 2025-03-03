@@ -1,4 +1,4 @@
-// types/dataSecurityTypes.js
+
 
 export const DataClassification = {
     PUBLIC: {

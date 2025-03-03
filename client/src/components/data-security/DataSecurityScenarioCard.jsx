@@ -1,4 +1,4 @@
-// components/games/components/data-security/ScenarioCard.jsx
+
 import React from 'react';
 import { FileText } from 'lucide-react';
 import { CheckCircle, XCircle, Info as InfoIcon } from 'lucide-react';
@@ -24,7 +24,7 @@ export const ScenarioCard = ({ scenario }) => {
   );
 };
 
-// components/games/components/data-security/ChoiceSelector.jsx
+
 export const ChoiceSelector = ({ 
   title, 
   icon: Icon, 
@@ -60,7 +60,7 @@ export const ChoiceSelector = ({
   );
 };
 
-// components/games/components/data-security/FeedbackPanel.jsx
+
 export const FeedbackPanel = ({
   choices,
   correctChoices,

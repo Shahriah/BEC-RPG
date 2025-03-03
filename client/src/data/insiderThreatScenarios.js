@@ -1,4 +1,4 @@
-// data/roleBasedInsiderScenarios.js
+
 import { ActivityTypes, Departments } from '../types/insiderThreatTypes';
 import { 
   Database, 

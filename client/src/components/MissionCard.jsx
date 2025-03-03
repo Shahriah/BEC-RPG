@@ -1,8 +1,8 @@
-// components/MissionCard.jsx
+
 import React from 'react';
 import { Star, Lock, Unlock, Target, Crown } from 'lucide-react';
 
-const MissionCard = ({ mission, onStart, selectedRole }) => {  // Added selectedRole prop
+const MissionCard = ({ mission, onStart, selectedRole }) => {  
   const { 
     title, 
     description, 

@@ -1,4 +1,3 @@
-// __tests__/utils.test.js
 import { cn } from '../../lib/utils';
 
 describe('cn utility function', () => {
@@ -11,12 +10,12 @@ describe('cn utility function', () => {
   });
 
   test('merges conflicting tailwind classes', () => {
-    // tailwind-merge should pick the later class if they conflict.
+    
     expect(cn("bg-red-500", "bg-blue-500")).toBe("bg-blue-500");
   });
 
   test('handles nested arrays', () => {
-    // clsx supports nested arrays; they should be flattened.
+    
     expect(cn(["p-4", "m-2"], "text-center")).toBe("p-4 m-2 text-center");
   });
 
@@ -27,7 +26,7 @@ describe('cn utility function', () => {
   });
 
   test('handles object syntax', () => {
-    // clsx supports an object syntax where keys with truthy values are included.
+    
     expect(cn({ "p-4": true, "text-center": false })).toBe("p-4");
   });
 

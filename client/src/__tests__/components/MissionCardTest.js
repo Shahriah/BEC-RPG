@@ -1,13 +1,13 @@
-// src/__tests__/components/MissionCard.test.jsx
+
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import MissionCard from '../../components/MissionCard.jsx';
 
-// A dummy icon to use in our tests.
+
 const DummyIcon = () => <div data-testid="dummy-icon">Icon</div>;
 
 describe('MissionCard Component', () => {
-  // Base mission object used for tests.
+  
   const baseMission = {
     title: "Test Mission",
     description: "Test Description",
@@ -24,7 +24,7 @@ describe('MissionCard Component', () => {
     expect(screen.getByText("Test Mission")).toBeInTheDocument();
     expect(screen.getByText("Test Description")).toBeInTheDocument();
     expect(screen.getByText("Beginner")).toBeInTheDocument();
-    // For an unlocked mission, the button should show "Start Mission"
+    
     expect(screen.getByRole('button')).toHaveTextContent("Start Mission");
   });
 
@@ -57,9 +57,9 @@ describe('MissionCard Component', () => {
   test('renders completed state: displays score and button text "Mission Complete"', () => {
     const completedMission = { ...baseMission, completed: true, score: 80, locked: false };
     render(<MissionCard mission={completedMission} onStart={jest.fn()} />);
-    // Check that the score is displayed (inside a span)
+    
     expect(screen.getByText("80%")).toBeInTheDocument();
-    // The button should display "Mission Complete"
+    
     expect(screen.getByRole('button')).toHaveTextContent("Mission Complete");
   });
 

@@ -1,4 +1,4 @@
-// src/types/becSecurityTypes.js
+
 import { Shield, Search, Phone, CheckCircle } from 'lucide-react';
 
 export const EmailType = {
@@ -34,7 +34,7 @@ export const ScenarioTypes = {
   URGENT_TRANSFER: 'urgent_transfer'
 };
 
-// New verification game types
+
 export const VerificationGameType = {
   CHECK_SENDER: 'check_sender',
   VERIFY_POLICY: 'verify_policy',

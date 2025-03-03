@@ -1,10 +1,10 @@
-// __tests__/InteractiveEmail.test.jsx
+
 import React from 'react';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import InteractiveEmail from '../../components/email-game/InteractiveEmail';
 
-// Mock Lucide icons
+
 jest.mock('lucide-react', () => ({
   AlertCircle: () => <span data-testid="alert-icon">Alert</span>,
   CheckCircle: () => <span data-testid="check-icon">Check</span>,
@@ -23,7 +23,7 @@ describe('InteractiveEmail', () => {
   test('renders email header and content correctly', () => {
     render(<InteractiveEmail email={sampleEmail} onAnalysisComplete={jest.fn()} />);
     
-    // Check header fields
+    
     expect(screen.getByText('From:')).toBeInTheDocument();
     expect(screen.getByText(sampleEmail.from)).toBeInTheDocument();
     expect(screen.getByText('Subject:')).toBeInTheDocument();
@@ -31,7 +31,7 @@ describe('InteractiveEmail', () => {
     expect(screen.getByText('Date:')).toBeInTheDocument();
     expect(screen.getByText(sampleEmail.timestamp)).toBeInTheDocument();
 
-    // Verify content parts
+    
     expect(screen.getByText('urgent')).toBeInTheDocument();
     expect(screen.getByText('$500')).toBeInTheDocument();
     expect(screen.getByText('immediately.')).toBeInTheDocument();
@@ -60,7 +60,7 @@ describe('InteractiveEmail', () => {
     fireEvent.click(hintsButton);
     expect(screen.getByText('Analysis Tips:')).toBeInTheDocument();
     
-    // Now should show "Hide Hints"
+    
     const hideButton = screen.getByText(/hide hints/i);
     fireEvent.click(hideButton);
     expect(screen.queryByText('Analysis Tips:')).not.toBeInTheDocument();
@@ -70,7 +70,7 @@ describe('InteractiveEmail', () => {
     const mockOnAnalysisComplete = jest.fn();
     render(<InteractiveEmail email={sampleEmail} onAnalysisComplete={mockOnAnalysisComplete} />);
 
-    // Click suspicious elements
+    
     const suspiciousWords = [
       'urgent',
       '$500',
@@ -86,7 +86,7 @@ describe('InteractiveEmail', () => {
     const submitButton = screen.getByText('Submit Analysis');
     fireEvent.click(submitButton);
 
-    // Complete the analysis
+    
     const continueButton = screen.getByRole('button', { name: /continue to response phase/i });
     fireEvent.click(continueButton);
     expect(mockOnAnalysisComplete).toHaveBeenCalled();
@@ -113,7 +113,7 @@ describe('InteractiveEmail', () => {
     const hintsButton = screen.getByText(/need hints/i);
     fireEvent.click(hintsButton);
     
-    // Check for actual tips shown in the component
+    
     const expectedTips = [
       'Click on suspicious words or phrases in the email',
       'Look for unusual urgency or pressure tactics',

@@ -5,12 +5,12 @@ import TimelineAnalysisView from '../insider-threat/TimelineAnalysisView';
 const InvestigationPanel = ({ 
   activity, 
   onClose, 
-  onFlagActivity,  // Add this prop
-  investigatedActivities  // Add this prop to track investigated activities
+  onFlagActivity,  
+  investigatedActivities  
 }) => {
   if (!activity) return null;
 
-  // Ensure the activity has the required structure
+  
   const preparedActivity = {
     ...activity,
     suspiciousFactors: activity.timeline

@@ -1,10 +1,8 @@
-// src/__tests__/routing.test.jsx
 import React from 'react';
 import { render, screen, cleanup } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../App';
 
-// Mock components
 jest.mock('../components/Dashboard', () => () => (
   <div data-testid="dashboard">Dashboard Mock</div>
 ));
@@ -21,7 +19,6 @@ jest.mock('../components/data-security/DataSecurityGame', () => () => (
   <div data-testid="data-game">Data Game Mock</div>
 ));
 
-// Remove Router from App component for testing
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   BrowserRouter: ({ children }) => children,

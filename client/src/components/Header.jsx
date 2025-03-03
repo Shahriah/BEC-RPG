@@ -1,4 +1,4 @@
-// components/Header.jsx
+
 import React from 'react';
 import { Shield, Trophy } from 'lucide-react';
 

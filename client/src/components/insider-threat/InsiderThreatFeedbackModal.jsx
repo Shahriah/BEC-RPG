@@ -1,4 +1,4 @@
-// src/components/insider-threat/InsiderThreatFeedbackModal.jsx
+
 import React from 'react';
 import { BookOpen, X } from 'lucide-react';
 

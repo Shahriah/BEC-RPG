@@ -56,7 +56,7 @@ const CheckSenderGame = ({ email, onComplete }) => {
     currentSteps: [...verificationSteps],
     showTutorial: true,
     selectedStep: null,
-    isComplete: false // Added isComplete state
+    isComplete: false 
   });
 
   const handleStepSelect = (stepId) => {
@@ -85,7 +85,7 @@ const CheckSenderGame = ({ email, onComplete }) => {
     let score = 100;
     let mistakes = 0;
 
-    // Compare current order with correct order
+    
     gameState.currentSteps.forEach((step, index) => {
       if (step.id !== verificationSteps[index].id) {
         score -= 20;
@@ -97,10 +97,10 @@ const CheckSenderGame = ({ email, onComplete }) => {
       ...prev,
       score,
       mistakes,
-      isComplete: true // Set complete state
+      isComplete: true 
     }));
 
-    // Pass score to parent component
+    
     onComplete(Math.max(0, score));
   };
 
@@ -129,7 +129,7 @@ const CheckSenderGame = ({ email, onComplete }) => {
     </div>
   );
 
-  // Tutorial Modal
+  
   const renderTutorial = () => (
     <div className="bg-white rounded-lg p-6">
       <div className="space-y-4">
@@ -156,7 +156,7 @@ const CheckSenderGame = ({ email, onComplete }) => {
     </div>
   );
 
-  // Completion Screen
+  
   const renderCompletion = () => (
     <div className="bg-white rounded-lg p-6">
       <div className="space-y-4">
@@ -212,7 +212,7 @@ const CheckSenderGame = ({ email, onComplete }) => {
     </div>
   );
 
-  // Game Interface
+  
   const renderGame = () => (
     <div>
       {renderEmailPreview()}
@@ -250,7 +250,7 @@ const CheckSenderGame = ({ email, onComplete }) => {
     </div>
   );
 
-  // If no email is provided, show an error state
+  
   if (!email) {
     return (
       <div className="text-center p-6 bg-red-50 rounded-lg">

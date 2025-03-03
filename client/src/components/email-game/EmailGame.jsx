@@ -1,4 +1,3 @@
-// components/games/EmailGame.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Info, ArrowLeft, Check, X, Trophy, Shield, AlertTriangle, Play } from 'lucide-react';

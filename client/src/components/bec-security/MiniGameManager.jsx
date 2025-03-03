@@ -20,13 +20,13 @@ const MiniGameManager = ({ email, onComplete }) => {
     };
   
     if (gameType === VerificationGameType.CONTACT_SUPERVISOR) {
-      // Calculate total score across all verification games
+      
       const totalScore = Math.round(Object.values(newScores).reduce((sum, s) => sum + s, 0) / 3);
       
-      // Only call onComplete once for the final game
+      
       onComplete(gameType, totalScore);
     } else {
-      // For other games, update scores and show transition
+      
       setGameState(prev => ({
         ...prev,
         scores: newScores,

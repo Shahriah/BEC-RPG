@@ -150,7 +150,7 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
        timeRemaining: 45
      }));
    } else {
-     // Calculate final score and show final feedback
+     
      const finalScore = Math.round(gameState.stepScores.reduce((a, b) => a + b, 0) / communicationSteps.length);
      
      setGameState(prev => ({
@@ -197,7 +197,7 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
       stepSelections: newStepSelections
     }));
   } else {
-    // Calculate final score
+    
     const finalScore = Math.round(newStepScores.reduce((a, b) => a + b, 0) / communicationSteps.length);
     
     setGameState(prev => ({
@@ -442,7 +442,7 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
    );
  };
 
- // Main render method
+ 
  if (gameState.showTutorial) {
    return renderTutorial();
  }

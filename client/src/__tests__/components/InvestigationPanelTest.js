@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { AlertTriangle, Info, X } from 'lucide-react';
 import InvestigationPanel from '../../components/insider-threat/InvestigationPanel';
 
-// Mock Lucide icons 
+
 jest.mock('lucide-react', () => ({
   AlertTriangle: ({ className, ...props }) => (
     <svg data-testid="alert-triangle-icon" className={className} {...props} />
@@ -17,7 +17,7 @@ jest.mock('lucide-react', () => ({
   ),
 }));
 
-// Mock TimelineAnalysisView component
+
 jest.mock('../../components/insider-threat/TimelineAnalysisView', () => {
   return function MockTimelineAnalysisView({ activity }) {
     return (
@@ -56,7 +56,7 @@ describe('InvestigationPanel Component', () => {
     return render(<InvestigationPanel {...combinedProps} />);
   };
 
-  // Rendering Tests
+  
   describe('Rendering', () => {
     test('renders nothing when no activity is provided', () => {
       const { container } = render(<InvestigationPanel activity={null} onClose={() => {}} />);
@@ -66,7 +66,7 @@ describe('InvestigationPanel Component', () => {
     test('renders activity details correctly', () => {
       renderComponent();
 
-      // Check employee and department details
+      
       expect(screen.getByText('John Doe')).toBeInTheDocument();
       expect(screen.getByText('IT Security')).toBeInTheDocument();
     });
@@ -74,14 +74,14 @@ describe('InvestigationPanel Component', () => {
     test('renders TimelineAnalysisView with prepared activity', () => {
       renderComponent();
 
-      // Check timeline analysis view
+      
       const timelineView = screen.getByTestId('timeline-analysis-view');
       expect(timelineView).toBeInTheDocument();
       expect(timelineView).toHaveTextContent('John Doe Timeline');
     });
   });
 
-  // Button Interaction Tests
+  
   describe('Button Interactions', () => {
     test('calls onClose when Close Investigation button is clicked', () => {
       renderComponent();
@@ -120,7 +120,7 @@ describe('InvestigationPanel Component', () => {
     });
   });
 
-  // Conditional Rendering Tests
+  
   describe('Conditional Rendering', () => {
     test('does not show flag buttons when activity is already investigated', () => {
       const investigatedActivities = new Set(['activity-1']);
@@ -138,19 +138,19 @@ describe('InvestigationPanel Component', () => {
     });
   });
 
-  // Prepared Activity Tests
+  
   describe('Prepared Activity', () => {
     test('prepares activity with suspicious factors', () => {
       renderComponent();
 
-      // Verify timeline analysis view receives prepared activity
+      
       const timelineView = screen.getByTestId('timeline-analysis-view');
       expect(timelineView).toHaveTextContent('John Doe Timeline');
     });
 
     test('handles activity with missing properties', () => {
       const incompleteActivity = {
-        // No id, employee, or department
+        
         timeline: []
       };
 
@@ -161,7 +161,7 @@ describe('InvestigationPanel Component', () => {
     });
   });
 
-  // Styling and Accessibility Tests
+  
   describe('Styling and Accessibility', () => {
     test('modal covers full screen with background overlay', () => {
       const { container } = renderComponent();

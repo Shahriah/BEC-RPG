@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import MiniGameManager from '../../components/bec-security/MiniGameManager';
 
-// Mock entire module before any imports
+
 jest.mock('../../types/becSecurityTypes', () => {
   const mockVerificationGameType = {
     CHECK_SENDER: 'check_sender',
@@ -51,13 +51,13 @@ jest.mock('../../types/becSecurityTypes', () => {
   };
 });
 
-// Mock Lucide icons
+
 jest.mock('lucide-react', () => ({
   Trophy: jest.fn(() => <div data-testid="trophy-icon" />),
   ArrowRight: jest.fn(() => <div data-testid="arrow-right-icon" />)
 }));
 
-// Explicit game component mocks
+
 jest.mock('../../components/bec-security/CheckSenderGame', () => {
   return function MockCheckSenderGame({ onComplete }) {
     return (
@@ -133,17 +133,17 @@ describe('MiniGameManager Component', () => {
     test('moves to policy verification after check sender', async () => {
       renderComponent();
 
-      // Find and click game submission button
+      
       const checkSenderSubmitButton = screen.getByText('Submit Sender Check');
       fireEvent.click(checkSenderSubmitButton);
 
-      // Wait for and click continue button
+      
       await waitFor(() => {
         const continueButton = screen.getByText('Continue to Next Step');
         fireEvent.click(continueButton);
       });
 
-      // Check policy verification game is rendered
+      
       expect(screen.getByTestId('policy-verification-game')).toBeInTheDocument();
     });
   });
@@ -152,7 +152,7 @@ describe('MiniGameManager Component', () => {
     test('calculates total score on final game completion', async () => {
       renderComponent();
 
-      // Complete all games
+      
       const checkSenderSubmitButton = screen.getByText('Submit Sender Check');
       fireEvent.click(checkSenderSubmitButton);
 
@@ -172,8 +172,8 @@ describe('MiniGameManager Component', () => {
       const supervisorSubmitButton = screen.getByText('Submit Supervisor Contact');
       fireEvent.click(supervisorSubmitButton);
 
-      // Check onComplete was called with final game type and calculated score
-      // (80 + 70 + 90) / 3 = 80
+      
+      
       expect(mockOnComplete).toHaveBeenCalledWith(
         'contact_supervisor', 
         80
@@ -185,14 +185,14 @@ describe('MiniGameManager Component', () => {
     test('updates progress tracker styling based on game state', async () => {
       renderComponent();
 
-      // Initial state - first step should be highlighted
+      
       const initialFirstStep = screen.getByText('Check Sender Details')
         .closest('[class*="p-4 rounded-lg"]');
       
       expect(initialFirstStep).toHaveClass('border-blue-500');
       expect(initialFirstStep).toHaveClass('bg-blue-50');
 
-      // Complete first game
+      
       const checkSenderSubmitButton = screen.getByText('Submit Sender Check');
       fireEvent.click(checkSenderSubmitButton);
 
@@ -201,7 +201,7 @@ describe('MiniGameManager Component', () => {
         fireEvent.click(continueButton);
       });
 
-      // Reselect steps after state change
+      
       const completedFirstStep = screen.getByText('Check Sender Details')
         .closest('[class*="p-4 rounded-lg"]');
       const currentSecondStep = screen.getByText('Verify Security Policy')

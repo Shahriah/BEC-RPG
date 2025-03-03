@@ -1,9 +1,7 @@
-// src/__tests__/components/AchievementBanner.test.jsx
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import AchievementBanner from '../../components/AchievementBanner';
 
-// Mock the lucide-react Trophy icon
 jest.mock('lucide-react', () => ({
   Trophy: () => <div data-testid="trophy-icon">Trophy Icon</div>
 }));
@@ -47,7 +45,6 @@ describe('AchievementBanner Component', () => {
   test('applies correct styling classes', () => {
     const { container } = render(<AchievementBanner {...defaultProps} />);
     
-    // Check for gradient background on the main container
     const banner = container.firstChild;
     expect(banner).toHaveClass(
       'bg-gradient-to-r',
@@ -58,11 +55,9 @@ describe('AchievementBanner Component', () => {
       'rounded-lg'
     );
     
-    // Check trophy icon's parent container has flex classes
     const trophyContainer = screen.getByTestId('trophy-icon').parentElement;
     expect(trophyContainer).toHaveClass('flex', 'items-center', 'gap-3');
 
-    // Check achievement counter styling
     const counter = screen.getByText('3/5 Achievements');
     expect(counter).toHaveClass('bg-yellow-100', 'text-yellow-700', 'rounded-full');
   });
@@ -70,14 +65,11 @@ describe('AchievementBanner Component', () => {
   test('handles missing props with default values', () => {
     render(<AchievementBanner />);
     
-    // Check if component renders without crashing
     expect(screen.getByText('Achievement Unlocked!')).toBeInTheDocument();
     
-    // Check if it shows achievements counter with empty values
     const achievementsText = screen.getByText(/Achievements/);
     expect(achievementsText).toBeInTheDocument();
     
-    // The parent div should contain "/"
     const parentDiv = achievementsText.parentElement;
     expect(parentDiv).toHaveTextContent('/');
   });

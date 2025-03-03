@@ -1,4 +1,4 @@
-// types/insiderThreatTypes.js
+
 
 export const ActivityTypes = {
     DATABASE_ACCESS: 'DATABASE_ACCESS',

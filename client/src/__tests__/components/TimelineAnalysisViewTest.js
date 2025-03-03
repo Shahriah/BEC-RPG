@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { Clock, TrendingUp, AlertTriangle, Activity, Info } from 'lucide-react';
 import TimelineAnalysisView from '../../components/insider-threat/TimelineAnalysisView';
 
-// Mock Lucide icons 
+
 jest.mock('lucide-react', () => ({
   Clock: ({ className, ...props }) => (
     <svg data-testid="clock-icon" className={className} {...props} />
@@ -59,13 +59,13 @@ describe('TimelineAnalysisView Component', () => {
     return render(<TimelineAnalysisView {...defaultProps} {...props} />);
   };
 
-  // Rendering Tests
+  
   describe('Rendering', () => {
     test('does not explicitly render employee and department', () => {
       renderComponent();
 
-      // Since the component doesn't explicitly render employee/department, 
-      // we'll check they are not breaking anything
+      
+      
       expect(screen.getByText('Historical Activity Pattern')).toBeInTheDocument();
     });
 
@@ -76,17 +76,17 @@ describe('TimelineAnalysisView Component', () => {
     });
   });
 
-  // Timeline Rendering Tests
+  
   describe('Timeline Rendering', () => {
     test('renders all timeline activities', () => {
       renderComponent();
 
-      // Normal activity details
+      
       expect(screen.getByText('2023-06-15 at 09:30')).toBeInTheDocument();
       expect(screen.getByText('Login: Normal workstation login')).toBeInTheDocument();
       expect(screen.getByText('Location: Office Main Campus')).toBeInTheDocument();
 
-      // Abnormal activity details
+      
       expect(screen.getByText('2023-06-15 at 22:45')).toBeInTheDocument();
       expect(screen.getByText('Network Access: Accessed restricted database')).toBeInTheDocument();
       expect(screen.getByText('Location: Remote')).toBeInTheDocument();
@@ -95,19 +95,19 @@ describe('TimelineAnalysisView Component', () => {
     test('applies correct styling for normal and abnormal activities', () => {
       const { container } = renderComponent();
 
-      // Check timeline items
+      
       const timelineItems = container.querySelectorAll('.border-l-2');
       expect(timelineItems[0]).toHaveClass('border-blue-200');
       expect(timelineItems[1]).toHaveClass('border-red-200');
 
-      // Check timeline item indicators
+      
       const indicators = container.querySelectorAll('.w-4.h-4.rounded-full');
       expect(indicators[0]).toHaveClass('bg-blue-100 border-blue-400');
       expect(indicators[1]).toHaveClass('bg-red-100 border-red-400');
     });
   });
 
-  // Abnormal Activities Tests
+  
   describe('Abnormal Activities', () => {
     test('renders abnormal activities section', () => {
       renderComponent();
@@ -123,7 +123,7 @@ describe('TimelineAnalysisView Component', () => {
     });
   });
 
-  // Edge Case Tests
+  
   describe('Edge Cases', () => {
     test('handles activity with no timeline', () => {
       const activityWithoutTimeline = {
@@ -144,10 +144,10 @@ describe('TimelineAnalysisView Component', () => {
 
       const { queryByText } = renderComponent({ activity: onlyNormalActivities });
 
-      // Check normal activity is rendered
+      
       expect(screen.getByText('Login: Normal workstation login')).toBeInTheDocument();
       
-      // Abnormal activities section should not be present
+      
       expect(queryByText('Abnormal Activities Detected')).not.toBeInTheDocument();
     });
 
@@ -162,7 +162,7 @@ describe('TimelineAnalysisView Component', () => {
     });
   });
 
-  // Styling Tests
+  
   describe('Styling Consistency', () => {
     test('uses consistent section styling', () => {
       const { container } = renderComponent();

@@ -1,4 +1,4 @@
-// data/dataSecurityScenarios.js
+
 import { DataClassification, AccessLevels, SecurityMeasures, DataTypes } from '../types/dataSecurityTypes';
 import { Users, FileSpreadsheet, FileText, Briefcase, Target } from 'lucide-react';
 

@@ -1,4 +1,4 @@
-// src/__tests__/components/data-security/DataSecurityComponents.test.jsx
+
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ScenarioCard, ChoiceSelector, FeedbackPanel } from '../../components/data-security/DataSecurityScenarioCard';
@@ -15,12 +15,12 @@ describe('ScenarioCard Component', () => {
     expect(screen.getByText(sampleScenario.title)).toBeInTheDocument();
     expect(screen.getByText(`Data Type: ${sampleScenario.dataType}`)).toBeInTheDocument();
     expect(screen.getByText(sampleScenario.content)).toBeInTheDocument();
-    // Verify that an SVG is rendered (using the default FileText icon)
+    
     expect(document.querySelector('svg')).toBeInTheDocument();
   });
 
   test('renders custom icon when provided', () => {
-    // Create a dummy icon component
+    
     const DummyIcon = () => <svg data-testid="dummy-icon" />;
     const customScenario = { ...sampleScenario, icon: DummyIcon };
     render(<ScenarioCard scenario={customScenario} />);
@@ -34,7 +34,7 @@ describe('ChoiceSelector Component', () => {
     option2: { value: 'value2', label: 'Option 2', description: 'Description 2' },
   };
 
-  // Create a dummy icon component
+  
   const DummyIcon = () => <svg data-testid="dummy-icon" />;
 
   test('renders title and options correctly', () => {
@@ -100,7 +100,7 @@ describe('ChoiceSelector Component', () => {
         disabled={false}
       />
     );
-    // Locate the button for Option 2 and check for selected classes
+    
     const option2Button = screen.getByText('Option 2').closest('button');
     expect(option2Button).toHaveClass('border-blue-500');
     expect(option2Button).toHaveClass('bg-blue-50');
@@ -114,9 +114,9 @@ describe('FeedbackPanel Component', () => {
     security: 'optionX',
   };
   const correctChoices = {
-    classification: 'option1', // correct
-    access: 'optionB',         // incorrect
-    security: 'optionX',       // correct
+    classification: 'option1', 
+    access: 'optionB',         
+    security: 'optionX',       
   };
   const explanations = {
     classification: 'Classification explanation',
@@ -135,20 +135,20 @@ describe('FeedbackPanel Component', () => {
         onNext={jest.fn()}
       />
     );
-    // Verify the main feedback header
+    
     expect(screen.getByText('Analysis & Feedback')).toBeInTheDocument();
 
-    // Verify that each explanation is rendered
+    
     expect(screen.getByText('Classification explanation')).toBeInTheDocument();
     expect(screen.getByText('Access explanation')).toBeInTheDocument();
     expect(screen.getByText('Security explanation')).toBeInTheDocument();
 
-    // Check that category labels are rendered (they appear as lower case)
+    
     expect(screen.getByText('classification')).toBeInTheDocument();
     expect(screen.getByText('access')).toBeInTheDocument();
     expect(screen.getByText('security')).toBeInTheDocument();
 
-    // Verify the security tips section is displayed
+    
     expect(screen.getByText('Security Tips')).toBeInTheDocument();
     expect(screen.getByText('Tip 1')).toBeInTheDocument();
     expect(screen.getByText('Tip 2')).toBeInTheDocument();

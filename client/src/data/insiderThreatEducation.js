@@ -1,4 +1,4 @@
-// src/data/insiderThreatEducation.js
+
 export const InsiderThreatEducationalFeedback = {
     CEO: {
       roleOverview: "CEOs are prime targets for Business Email Compromise (BEC) due to their high-level access and authority.",

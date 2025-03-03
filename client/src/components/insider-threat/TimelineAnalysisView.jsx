@@ -2,7 +2,7 @@ import React from 'react';
 import { Clock, TrendingUp, AlertTriangle, Activity, Info } from 'lucide-react';
 
 const TimelineAnalysisView = ({ activity }) => {
-  // Destructure the activity with default empty values
+  
   const { 
     employee = 'Unknown Employee', 
     department = 'Unknown Department', 
@@ -10,7 +10,7 @@ const TimelineAnalysisView = ({ activity }) => {
     timeline = [] 
   } = activity;
 
-  // Group normal and abnormal activities
+  
   const normalActivities = timeline.filter(item => item.isNormal);
   const abnormalActivities = timeline.filter(item => !item.isNormal);
 

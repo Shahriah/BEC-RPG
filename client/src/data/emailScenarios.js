@@ -1,4 +1,4 @@
-// data/emailScenarios.js
+
 export const EmailScenarios = {
     CEO: [
       {

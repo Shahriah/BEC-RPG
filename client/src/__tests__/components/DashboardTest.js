@@ -1,4 +1,3 @@
-// src/__tests__/components/Dashboard.test.jsx
 import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';

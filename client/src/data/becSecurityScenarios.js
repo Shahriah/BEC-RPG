@@ -44,7 +44,7 @@ CEO Smith`,
     correctVerification: [
       VerificationGameType.CHECK_SENDER,
       VerificationGameType.VERIFY_POLICY
-    ],  // Changed from requiredVerifications and removed CONTACT_SUPERVISOR for now
+    ],  
     correctAction: ActionTypes.FLAG,
     securityProtocol: "All payment requests must go through finance department with proper documentation.",
     learningPoints: [
@@ -94,7 +94,7 @@ Accounts Team`,
     correctVerification: [
       VerificationGameType.CHECK_SENDER,
       VerificationGameType.VERIFY_POLICY
-    ],  // Changed from requiredVerifications and simplified to current implemented games
+    ],  
     correctAction: ActionTypes.HOLD,
     securityProtocol: "Bank detail changes require formal documentation and multi-channel verification.",
     learningPoints: [

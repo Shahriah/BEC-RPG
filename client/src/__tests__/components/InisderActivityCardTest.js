@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { AlertTriangle, Clock, Shield, Check, X } from 'lucide-react';
 import ActivityCard from '../../components/insider-threat/InsiderActivityCard';
 
-// Mock Lucide icons to simplify testing
+
 jest.mock('lucide-react', () => ({
   AlertTriangle: jest.fn(() => <div data-testid="alert-triangle-icon" />),
   Clock: jest.fn(() => <div data-testid="clock-icon" />),
@@ -42,12 +42,12 @@ describe('ActivityCard Component', () => {
     return render(<ActivityCard {...combinedProps} />);
   };
 
-  // Render Tests
+  
   describe('Rendering', () => {
     test('renders basic activity information correctly', () => {
       renderComponent();
 
-      // Check employee details
+      
       expect(screen.getByText('John Doe')).toBeInTheDocument();
       expect(screen.getByText('IT • Level 2')).toBeInTheDocument();
       expect(screen.getByText('2023-06-15 10:30 AM')).toBeInTheDocument();
@@ -71,7 +71,7 @@ describe('ActivityCard Component', () => {
     });
   });
 
-  // Button Interaction Tests
+  
   describe('Button Interactions', () => {
     test('calls onInvestigate when Investigate button is clicked', () => {
       renderComponent();
@@ -108,7 +108,7 @@ describe('ActivityCard Component', () => {
     });
   });
 
-  // Feedback Rendering Tests
+  
   describe('Feedback Rendering', () => {
     test('shows correct feedback for suspicious activity flagged correctly', () => {
       renderComponent({ 
@@ -163,7 +163,7 @@ describe('ActivityCard Component', () => {
     });
   });
 
-  // Edge Case Tests
+  
   describe('Edge Cases', () => {
     test('renders without flags', () => {
       renderComponent({ 
@@ -171,7 +171,7 @@ describe('ActivityCard Component', () => {
         isFlagged: true 
       });
 
-      // Ensures no errors occur when flags are undefined
+      
       expect(screen.getByText('John Doe')).toBeInTheDocument();
     });
 

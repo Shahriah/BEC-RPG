@@ -1,10 +1,10 @@
-// RoleSelectionSection.test.jsx
+
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import RoleSelectionSection from '../../components/RoleSelectionSection';
 import { Roles } from '../../types/roleTypes';
 
-// Mock Lucide icons to simplify testing
+
 jest.mock('lucide-react', () => ({
   Shield: () => <div data-testid="shield-icon">Shield</div>,
   Users: () => <div data-testid="users-icon">Users</div>,
@@ -13,14 +13,14 @@ jest.mock('lucide-react', () => ({
 }));
 
 describe('RoleSelectionSection', () => {
-  // Prepare roles for testing
+  
   const mockRoles = Object.values(Roles);
   const ceoRole = mockRoles.find(role => role.id === 'ceo');
 
   test('renders section header correctly', () => {
     render(<RoleSelectionSection selectedRole={null} onRoleSelect={() => {}} />);
 
-    // Check section title and description
+    
     expect(screen.getByText('Select Your Role')).toBeInTheDocument();
     expect(screen.getByText('Choose your role to experience different security perspectives')).toBeInTheDocument();
   });
@@ -28,7 +28,7 @@ describe('RoleSelectionSection', () => {
   test('renders all role cards', () => {
     render(<RoleSelectionSection selectedRole={null} onRoleSelect={() => {}} />);
 
-    // Check that all role cards are rendered
+    
     mockRoles.forEach(role => {
       const titleElements = screen.getAllByText(role.title);
       expect(titleElements.length).toBeGreaterThan(0);
@@ -40,7 +40,7 @@ describe('RoleSelectionSection', () => {
     const mockOnRoleSelect = jest.fn();
     render(<RoleSelectionSection selectedRole={null} onRoleSelect={mockOnRoleSelect} />);
 
-    // Find and click CEO role card - use getAllByText and get the first one in the role card
+    
     const ceoRoleCards = screen.getAllByText(ceoRole.title);
     const ceoRoleCard = ceoRoleCards.find(el => 
       el.closest('div[class*="bg-white rounded-lg p-4"]')
@@ -48,17 +48,17 @@ describe('RoleSelectionSection', () => {
     
     fireEvent.click(ceoRoleCard);
 
-    // Verify onRoleSelect was called with correct role
+    
     expect(mockOnRoleSelect).toHaveBeenCalledWith(ceoRole);
   });
 
   test('shows selected role details when a role is selected', () => {
     render(<RoleSelectionSection selectedRole={ceoRole} onRoleSelect={() => {}} />);
 
-    // Check selected role details are shown
+    
     expect(screen.getByText('Current Role:')).toBeInTheDocument();
     
-    // Use queryAllByText and check the correct span element
+    
     const roleNameElements = screen.getAllByText(ceoRole.title);
     const currentRoleSpan = roleNameElements.find(el => 
       el.closest('span[class="text-sm text-gray-900"]')
@@ -70,18 +70,18 @@ describe('RoleSelectionSection', () => {
     const mockOnRoleSelect = jest.fn();
     render(<RoleSelectionSection selectedRole={ceoRole} onRoleSelect={mockOnRoleSelect} />);
 
-    // Find and click "Change Role" button
+    
     const changeRoleButton = screen.getByText('Change Role');
     fireEvent.click(changeRoleButton);
 
-    // Verify onRoleSelect was called with null
+    
     expect(mockOnRoleSelect).toHaveBeenCalledWith(null);
   });
 
   test('applies correct styling to selected role card', () => {
     render(<RoleSelectionSection selectedRole={ceoRole} onRoleSelect={() => {}} />);
 
-    // Find the CEO role card - use getAllByText and find the correct card
+    
     const ceoRoleCards = screen.getAllByText(ceoRole.title);
     const ceoRoleCard = ceoRoleCards.find(el => 
       el.closest('div[class*="ring-2 ring-blue-500 shadow-md"]')
@@ -89,7 +89,7 @@ describe('RoleSelectionSection', () => {
     
     const parentDiv = ceoRoleCard.closest('div[class*="bg-white rounded-lg p-4"]');
     
-    // Check for selected state classes
+    
     expect(parentDiv).toHaveClass('ring-2');
     expect(parentDiv).toHaveClass('ring-blue-500');
     expect(parentDiv).toHaveClass('shadow-md');
@@ -98,7 +98,7 @@ describe('RoleSelectionSection', () => {
   test('renders correct icons for each role', () => {
     render(<RoleSelectionSection selectedRole={null} onRoleSelect={() => {}} />);
 
-    // Check that icons are rendered for each role
+    
     const expectedIcons = {
       ceo: 'shield-icon',
       finance: 'badge-dollar-icon',

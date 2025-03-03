@@ -1,4 +1,4 @@
-// components/insider-threat/ActivityCard.jsx
+
 import React, { useState } from 'react';
 import { AlertTriangle, Clock, Shield, Check, X } from 'lucide-react';
 

@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { BookOpen, X } from 'lucide-react';
 import InsiderThreatFeedbackModal from '../../components/insider-threat/InsiderThreatFeedbackModal';
 
-// Mock Lucide icons to add test IDs
+
 jest.mock('lucide-react', () => ({
   BookOpen: ({ className, ...props }) => (
     <svg data-testid="book-open-icon" className={className} {...props} />
@@ -39,7 +39,7 @@ describe('InsiderThreatFeedbackModal Component', () => {
     return render(<InsiderThreatFeedbackModal {...defaultProps} {...props} />);
   };
 
-  // Rendering Tests
+  
   describe('Rendering', () => {
     test('renders nothing when no feedback is provided', () => {
       const { container } = render(<InsiderThreatFeedbackModal feedback={null} onClose={() => {}} />);
@@ -62,16 +62,16 @@ describe('InsiderThreatFeedbackModal Component', () => {
     });
   });
 
-  // Content Tests
+  
   describe('Content Rendering', () => {
     test('renders all feedback sections', () => {
       renderComponent();
       
-      // Check first section
+      
       expect(screen.getByText('First Insight')).toBeInTheDocument();
       expect(screen.getByText('Detailed explanation of the first insight.')).toBeInTheDocument();
       
-      // Check second section
+      
       expect(screen.getByText('Second Insight')).toBeInTheDocument();
       expect(screen.getByText('Additional details about the second insight.')).toBeInTheDocument();
     });
@@ -82,15 +82,15 @@ describe('InsiderThreatFeedbackModal Component', () => {
       const sections = container.querySelectorAll('[class*="bg-blue-50"], [class*="bg-yellow-50"]');
       expect(sections).toHaveLength(2);
       
-      // First section should have blue background
+      
       expect(sections[0]).toHaveClass('bg-blue-50');
       
-      // Second section should have yellow background
+      
       expect(sections[1]).toHaveClass('bg-yellow-50');
     });
   });
 
-  // Interaction Tests
+  
   describe('Interactions', () => {
     test('calls onClose when close button is clicked', () => {
       renderComponent();
@@ -111,7 +111,7 @@ describe('InsiderThreatFeedbackModal Component', () => {
     });
   });
 
-  // Message Tests
+  
   describe('Message Rendering', () => {
     test('renders correct message for correct insight', () => {
       renderComponent();
@@ -130,7 +130,7 @@ describe('InsiderThreatFeedbackModal Component', () => {
     });
   });
 
-  // Accessibility and Styling Tests
+  
   describe('Accessibility and Styling', () => {
     test('modal covers full screen with background overlay', () => {
       const { container } = renderComponent();

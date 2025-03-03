@@ -2,7 +2,7 @@ import React from 'react';
 import { Target, Medal } from 'lucide-react';
 
 const ProgressCard = ({ progress, points }) => {
-  // Calculate next rank threshold
+  
   const getNextRankInfo = (currentPoints) => {
     if (currentPoints < 500) return { rank: 'Trainee', threshold: 500 };
     if (currentPoints < 1500) return { rank: 'Defender', threshold: 1500 };
