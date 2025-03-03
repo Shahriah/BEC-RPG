@@ -64,9 +64,7 @@ out
 .nuxt
 dist
 
-# Gatsby files
-.cache/
-public
+
 
 # Mac files
 .DS_Store
