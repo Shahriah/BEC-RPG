@@ -3,6 +3,7 @@ import { Phone, Clock, CheckCircle, XCircle, AlertCircle, MessageCircle, Mail } 
 import { VerificationGameType } from '../../types/becSecurityTypes';
 
 const ContactSupervisorGame = ({ email, onComplete }) => {
+  // set initial game state
  const [gameState, setGameState] = useState({
    showTutorial: true,
    currentStep: 0,
@@ -15,7 +16,7 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
    showStepFeedback: false,
    showFinalFeedback: false
  });
-
+// define the communication steps for the game
  const communicationSteps = [
    {
      id: 'identify-concerns',
@@ -108,7 +109,7 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
      ]
    }
  ];
-
+// set up game logic ensuring payer is within time 
  useEffect(() => {
    if (!gameState.showTutorial && !gameState.isComplete && gameState.timeRemaining > 0) {
      const timer = setInterval(() => {
@@ -122,12 +123,15 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
    }
  }, [gameState.showTutorial, gameState.isComplete, gameState.timeRemaining]);
 
+
+// auto submit when time runs out
  useEffect(() => {
    if (gameState.timeRemaining === 0) {
      handleSubmit();
    }
  }, [gameState.timeRemaining]);
 
+// handle option selection
  const handleOptionSelect = (optionId) => {
    setGameState(prev => {
      const newSelected = prev.selectedOptions.includes(optionId)
@@ -139,7 +143,7 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
      };
    });
  };
-
+ // move to next step or complete training
  const handleContinue = () => {
    if (gameState.currentStep < communicationSteps.length - 1) {
      setGameState(prev => ({
@@ -150,7 +154,8 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
        timeRemaining: 45
      }));
    } else {
-     
+
+     // calculate final score by averaging step scores
      const finalScore = Math.round(gameState.stepScores.reduce((a, b) => a + b, 0) / communicationSteps.length);
      
      setGameState(prev => ({
@@ -165,13 +170,15 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
  const handleSubmit = () => {
   const currentStep = communicationSteps[gameState.currentStep];
   const correctOptions = currentStep.options.filter(opt => opt.correct);
+  // calculate step score based on selected options
   const selectedCorrect = gameState.selectedOptions.filter(id => 
     currentStep.options.find(opt => opt.id === id && opt.correct)
   ).length;
+  // penalize for selecting incorrect options
   const selectedIncorrect = gameState.selectedOptions.filter(id => 
     currentStep.options.find(opt => opt.id === id && !opt.correct)
   ).length;
-
+  // calculate step score
   const stepScore = Math.max(0, Math.min(100,
     (selectedCorrect / correctOptions.length) * 100 - (selectedIncorrect * 25)
   ));
@@ -184,7 +191,7 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
     correctOptions: correctOptions,
     score: stepScore
   };
-
+  
   const newStepScores = [...gameState.stepScores, stepScore];
   const newStepSelections = [...gameState.stepSelections, stepSelection];
 
@@ -197,7 +204,7 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
       stepSelections: newStepSelections
     }));
   } else {
-    
+    // calculate final score by averaging step scores
     const finalScore = Math.round(newStepScores.reduce((a, b) => a + b, 0) / communicationSteps.length);
     
     setGameState(prev => ({
@@ -210,7 +217,7 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
     }));
   }
 };
-
+// show feedback for each step
  const renderStepFeedback = () => {
    const currentStep = communicationSteps[gameState.currentStep];
    const stepSelection = gameState.stepSelections[gameState.currentStep];
@@ -243,7 +250,7 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
            </div>
          ))}
          
-         {/* Highlight missed correct options */}
+         {/* highlight missed correct options */}
          {stepSelection.correctOptions
            .filter(correct => 
              !stepSelection.selectedOptions.some(selected => selected.id === correct.id)
@@ -321,7 +328,7 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
               </div>
             ))}
             
-            {/* Highlight missed correct options */}
+            {/* highlight missed correct options */}
             {step.correctOptions
               .filter(correct => 
                 !step.selectedOptions.some(selected => selected.id === correct.id)
@@ -347,14 +354,15 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
         </div>
       ))}
 
-      <button
-        onClick={() => {
-          onComplete(VerificationGameType.CONTACT_SUPERVISOR, gameState.score);
-        }}
-        className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-      >
-        Complete Training
-      </button>
+    <button
+      onClick={() => {
+        console.log("Clicked Complete Training, final score:", gameState.score);
+        onComplete(gameState.score);
+      }}
+      className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+    >
+      Complete Training
+    </button>
     </div>
   );
 };

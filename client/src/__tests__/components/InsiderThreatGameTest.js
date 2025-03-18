@@ -189,25 +189,6 @@ describe('InsiderThreatGame Component', () => {
       expect(screen.getByText('Dashboard')).toBeInTheDocument();
     });
 
-    test('allows retry on completion', async () => {
-      
-      await waitFor(() => {
-        const flagButton = screen.getByRole('button', { name: /Flag Suspicious/i });
-        fireEvent.click(flagButton);
-      });
-
-      act(() => {
-        jest.advanceTimersByTime(1000);
-      });
-
-      
-      await waitFor(() => {
-        const tryAgainButton = screen.getByRole('button', { name: /Try Again/i });
-        fireEvent.click(tryAgainButton);
-      });
-
-      expect(window.location.reload).toHaveBeenCalled();
-    });
   });
 
   

@@ -72,11 +72,12 @@ const Dashboard = () => {
         }
     ];
 
-    // Fetch user data
+    // fetch user data and set up temporary user for game
     useEffect(() => {
         const fetchUserData = async () => {
             try {
                 const response = await fetch('http://localhost:5000/api/users/testuser');
+                // successful user obtained
                 if (response.ok) {
                     const data = await response.json();
                     setUserData(data);
@@ -95,6 +96,7 @@ const Dashboard = () => {
             } catch (error) {
                 console.error('Error fetching user data:', error);
             } finally {
+                // finish loading screen 
                 setIsLoading(false);
             }
         };
@@ -102,6 +104,7 @@ const Dashboard = () => {
         fetchUserData();
     }, []);
 
+    // adjust selected role using localStorage which keeps track of currently selected role
     const handleRoleSelect = (role) => {
         setSelectedRole(role);
         if (role) {
@@ -110,7 +113,8 @@ const Dashboard = () => {
             localStorage.removeItem('selectedRole');
         }
     };
-
+    
+    // display loading screen
     if (isLoading) {
         return (
             <div className="min-h-screen bg-slate-100 flex items-center justify-center">
@@ -123,7 +127,6 @@ const Dashboard = () => {
 
     return (
         <div className="min-h-screen bg-slate-100">
-            {/* Render Header directly; the mock Header returns its own data-testid */}
             <Header
                 completedMissions={completedMissions}
                 totalMissions={missions.length}
@@ -131,7 +134,7 @@ const Dashboard = () => {
             />
 
             <div className="flex">
-                {/* Side Panel for Role Selection */}
+                {/* side panel */}
                 <div className="w-64 min-h-[calc(100vh-64px)] bg-white border-r border-gray-200 p-4">
                     <div className="mb-4">
                         <h2 className="text-lg font-semibold text-gray-900">Select Role</h2>
@@ -190,7 +193,7 @@ const Dashboard = () => {
                     )}
                 </div>
 
-                {/* Main Content Area */}
+                {/* main content */}
                 <main className="flex-1 p-4 space-y-6">
                     <ProgressCard
                         progress={(completedMissions / missions.length) * 100}
@@ -219,7 +222,7 @@ const Dashboard = () => {
                         ))}
                     </div>
 
-                    {/* Render AchievementBanner directly; the mock returns its own data-testid */}
+                    {/* achievement banner */}
                     <AchievementBanner
                         achieved={userData.achievements?.length || 0}
                         total={5}

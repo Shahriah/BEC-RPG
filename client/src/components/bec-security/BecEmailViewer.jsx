@@ -70,7 +70,7 @@ export const ActionPanel = ({ onAction, onVerify, verificationSteps = [], disabl
         </button>
       </div>
 
-      {/* Verification Steps */}
+      {/* verification Steps */}
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <h4 className="font-medium mb-2">Verification Steps</h4>
         <div className="space-y-2">
@@ -99,6 +99,7 @@ export const ActionPanel = ({ onAction, onVerify, verificationSteps = [], disabl
   );
 };
 
+// provides feedback on the email verification process
 export const FeedbackPanel = ({
   email,
   verificationSteps,
@@ -126,7 +127,7 @@ export const FeedbackPanel = ({
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
-      {/* Result Header */}
+      {/* results header */}
       <div className="flex items-center gap-2 mb-4">
         {isCorrect ? (
           <CheckCircle className="w-6 h-6 text-green-600" />
@@ -139,7 +140,7 @@ export const FeedbackPanel = ({
       </div>
 
       <div className="space-y-4">
-        {/* Analysis */}
+        {/* analysis section */}
         <div className={`p-4 rounded-lg ${
           isCorrect ? 'bg-green-50' : 'bg-red-50'
         }`}>
@@ -148,7 +149,7 @@ export const FeedbackPanel = ({
           <p className="mt-2">{email.securityProtocol}</p>
         </div>
 
-        {/* Verification Steps Review */}
+        {/* verification steps review */}
         <div className="bg-blue-50 p-4 rounded-lg">
           <h4 className="font-medium flex items-center gap-2 mb-2">
             <Info className="w-4 h-4" />
@@ -170,7 +171,7 @@ export const FeedbackPanel = ({
           </ul>
         </div>
 
-        {/* Score Summary */}
+        {/* final score */}
         <div className="bg-gray-50 p-4 rounded-lg">
           <h4 className="font-medium mb-2">Score Summary:</h4>
           <div className="space-y-1 text-sm">
@@ -189,7 +190,7 @@ export const FeedbackPanel = ({
           </div>
         </div>
 
-        {/* Learning Points */}
+        {/* learning points */}
         <div className="bg-yellow-50 p-4 rounded-lg">
           <h4 className="font-medium mb-2">Learning Points:</h4>
           <ul className="list-disc list-inside space-y-1">

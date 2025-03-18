@@ -10,52 +10,52 @@ const TimelineAnalysisView = ({ activity }) => {
     timeline = [] 
   } = activity;
 
-  
+  // set normal activities and abnormal activities
   const normalActivities = timeline.filter(item => item.isNormal);
   const abnormalActivities = timeline.filter(item => !item.isNormal);
 
   return (
-    <div className="space-y-6">
-      {/* Historical Activity Timeline */}
-      <div className="bg-blue-50 p-4 rounded-lg">
-        <h3 className="font-semibold flex items-center gap-2 mb-3">
+    <div className="space-y-4 sm:space-y-6">
+      {/* historical activity timeline */}
+      <div className="bg-blue-50 p-4 sm:p-6 rounded-lg">
+        <h3 className="font-semibold flex items-center gap-2 mb-3 text-sm sm:text-base">
           <Activity className="w-4 h-4" />
           Historical Activity Pattern
         </h3>
-        <div className="space-y-4">
-          <div className="text-sm">
+        <div className="space-y-3 sm:space-y-4">
+          <div className="text-xs sm:text-sm">
             <p className="mb-2">Normal Pattern: {normalPattern}</p>
           </div>
 
-          {/* Previous Activities Timeline */}
+          {/* previous activities timeline */}
           <div className="relative">
-            {timeline.map((activity, index) => (
+            {timeline.map((item, index) => (
               <div 
                 key={index} 
-                className={`mb-4 relative pl-6 border-l-2 ${
-                  activity.isNormal ? 'border-blue-200' : 'border-red-200'
+                className={`mb-3 sm:mb-4 relative pl-6 border-l-2 ${
+                  item.isNormal ? 'border-blue-200' : 'border-red-200'
                 }`}
               >
                 <div 
                   className={`absolute left-0 top-0 -translate-x-[9px] w-4 h-4 rounded-full ${
-                    activity.isNormal 
+                    item.isNormal 
                     ? 'bg-blue-100 border-2 border-blue-400' 
                     : 'bg-red-100 border-2 border-red-400'
                   }`} 
                 />
-                <div className="text-sm">
+                <div className="text-xs sm:text-sm">
                   <div className="font-medium">
-                    {activity.date} at {activity.time}
+                    {item.date} at {item.time}
                   </div>
-                  <div className={`${!activity.isNormal ? 'text-red-600 font-medium' : 'text-gray-600'}`}>
-                    {activity.action}: {activity.details}
+                  <div className={`${!item.isNormal ? 'text-red-600 font-medium' : 'text-gray-600'}`}>
+                    {item.action}: {item.details}
                   </div>
                   <div className="text-gray-600">
-                    Location: {activity.location}
+                    Location: {item.location}
                   </div>
-                  {!activity.isNormal && activity.alerts && (
+                  {!item.isNormal && item.alerts && (
                     <div className="mt-1 space-y-1">
-                      {activity.alerts.map((alert, alertIndex) => (
+                      {item.alerts.map((alert, alertIndex) => (
                         <div 
                           key={alertIndex} 
                           className="flex items-center gap-2 text-red-600"
@@ -73,26 +73,26 @@ const TimelineAnalysisView = ({ activity }) => {
         </div>
       </div>
 
-      {/* Abnormal Activities Highlight */}
+      {/* abnormal activities*/}
       {abnormalActivities.length > 0 && (
-        <div className="bg-red-50 p-4 rounded-lg">
-          <h3 className="font-semibold flex items-center gap-2 mb-3">
+        <div className="bg-red-50 p-4 sm:p-6 rounded-lg">
+          <h3 className="font-semibold flex items-center gap-2 mb-3 text-sm sm:text-base">
             <AlertTriangle className="w-4 h-4 text-red-600" />
             Abnormal Activities Detected
           </h3>
-          <ul className="space-y-2">
-            {abnormalActivities.map((activity, index) => (
-              <li key={index} className="text-sm">
+          <ul className="space-y-1 sm:space-y-2">
+            {abnormalActivities.map((item, index) => (
+              <li key={index} className="text-xs sm:text-sm">
                 <div className="flex items-start gap-2">
                   <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5" />
                   <div>
-                    <span className="font-medium">{activity.date} at {activity.time}: </span>
-                    {activity.details}
+                    <span className="font-medium">{item.date} at {item.time}: </span>
+                    {item.details}
                   </div>
                 </div>
-                {activity.alerts && (
+                {item.alerts && (
                   <div className="ml-6 mt-1 space-y-1">
-                    {activity.alerts.map((alert, alertIndex) => (
+                    {item.alerts.map((alert, alertIndex) => (
                       <div key={alertIndex} className="text-xs text-red-700">
                         • {alert}
                       </div>

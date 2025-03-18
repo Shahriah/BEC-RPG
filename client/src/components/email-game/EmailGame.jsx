@@ -10,7 +10,7 @@ const EmailGame = () => {
   const roleId = location.state?.roleId;
   const roleName = location.state?.roleName;
 
-  // State Management
+  // set all states at the start of game
   const [startTime] = useState(Date.now());
   const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -24,10 +24,11 @@ const EmailGame = () => {
 
 
 
-  // Get scenarios for the selected role
+  // retrieve scenaris for diferent, specified roles
   const roleScenarios = EmailScenarios[roleId?.toUpperCase()] || [];
   const currentScenario = roleScenarios[currentScenarioIndex];
 
+  // if user is not assigned a role, redirect to home page
   useEffect(() => {
     if (!roleId) {
       navigate('/');
@@ -43,10 +44,11 @@ const EmailGame = () => {
       response: option.points
     };
 
+    // calculate final score dependent upon analysis and response scores
     const finalScore = Math.round((totalScore.analysis + totalScore.response) / 2);
 
     if (currentScenarioIndex === roleScenarios.length - 1) {
-      // Handle final scenario completion
+      // send api call to backend to save progress
       try {
         const response = await fetch('http://localhost:5000/api/missions/complete', {
           method: 'POST',
@@ -101,13 +103,15 @@ const EmailGame = () => {
     );
   };
 
+
+  // restes all states to handle the next scenario
   const handleNextScenario = () => {
     setCurrentScenarioIndex(prev => prev + 1);
     setSelectedOption(null);
     setShowFeedback(false);
     setShowOptions(false);
     setAnalysisScore(0);
-    setSelectedFlags([]); // Reset selected flags
+    setSelectedFlags([]); 
   };
 
   const renderCompletionModal = () => {
@@ -156,7 +160,7 @@ const EmailGame = () => {
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-4 overflow-hidden">
         <div className="grid md:grid-cols-2">
-          {/* Left Side - Informative Content */}
+          {/* left side */}
           <div className="bg-blue-600 text-white p-8 flex flex-col justify-center">
             <div className="mb-6">
               <Mail className="w-16 h-16 text-white mb-4" strokeWidth={1.5} />
@@ -196,7 +200,7 @@ const EmailGame = () => {
             </div>
           </div>
           
-          {/* Right Side - Role and Mission Details */}
+          {/*right side */}
           <div className="p-8">
             <div className="mb-6">
               <h3 className="text-2xl font-bold mb-2">Your Mission: {roleName}</h3>
@@ -245,7 +249,7 @@ const EmailGame = () => {
   return (
     <div className="min-h-screen bg-slate-100 p-4">
       <div className="max-w-4xl mx-auto space-y-4">
-        {/* Back Button */}
+        {/* redirect to home */}
         <button 
           onClick={() => navigate('/')}
           className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
@@ -256,7 +260,7 @@ const EmailGame = () => {
         {showTutorial && renderTutorial()}
 
   
-        {/* Header */}
+        {/* header */}
         <div className="bg-white rounded-lg shadow-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <Mail className="w-5 h-5 text-blue-600" />
@@ -270,13 +274,13 @@ const EmailGame = () => {
           </div>
         </div>
   
-        {/* Scenario Context */}
+        {/* information on scenario */}
         <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
           <h2 className="font-semibold mb-2">{currentScenario.title}</h2>
           <p className="text-gray-700">{currentScenario.context}</p>
         </div>
   
-        {/* Learning Objectives */}
+        {/* objectives */}
         <div className="bg-green-50 border border-green-100 rounded-lg p-4">
           <h3 className="font-semibold mb-2 flex items-center gap-2">
             <Info className="w-4 h-4 text-green-700" />
@@ -292,7 +296,7 @@ const EmailGame = () => {
           </ul>
         </div>
   
-        {/* Current Email Display - Always visible */}
+        {/* alays displaying email */}
         <div className="bg-white rounded-lg shadow-lg p-6">
           <div className="font-mono text-sm border rounded p-4 mb-4">
             <div><strong>From:</strong> {currentScenario.initialSituation.from}</div>
@@ -362,7 +366,7 @@ const EmailGame = () => {
           )}
         </div>
   
-        {/* Feedback Section */}
+        {/* immediate feedback section */}
         {showFeedback && (
           <div className="space-y-4">
             {renderScoreFeedback()}
@@ -394,7 +398,7 @@ const EmailGame = () => {
           </div>
         )}
   
-        {/* Completion Modal */}
+        {/* completion pop up */}
         {renderCompletionModal()}
       </div>
     </div>

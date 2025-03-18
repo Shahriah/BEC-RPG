@@ -163,3 +163,9 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+app.use(cors({
+    origin: "*", // Allow all domains for testing, but restrict this in production
+    methods: "GET,POST,PUT,DELETE",
+    allowedHeaders: "Content-Type,Authorization"
+}));

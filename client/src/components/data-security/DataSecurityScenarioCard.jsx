@@ -3,6 +3,8 @@ import React from 'react';
 import { FileText } from 'lucide-react';
 import { CheckCircle, XCircle, Info as InfoIcon } from 'lucide-react';
 
+
+// displays the current scenario
 export const ScenarioCard = ({ scenario }) => {
   const Icon = scenario.icon || FileText;
   
@@ -24,7 +26,7 @@ export const ScenarioCard = ({ scenario }) => {
   );
 };
 
-
+// allows the user to select and deslect options 
 export const ChoiceSelector = ({ 
   title, 
   icon: Icon, 
@@ -60,7 +62,7 @@ export const ChoiceSelector = ({
   );
 };
 
-
+// renders and decides user feedback
 export const FeedbackPanel = ({
   choices,
   correctChoices,

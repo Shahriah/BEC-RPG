@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Shield, Clock, CheckCircle, XCircle, AlertTriangle, Info, Mail } from 'lucide-react';
 
 const PolicyVerificationGame = ({ email, onComplete }) => {
-  
+  // set game state and timer
   const [gameState, setGameState] = useState({
     showTutorial: true,
     selectedPolicies: new Set(),
@@ -11,7 +11,7 @@ const PolicyVerificationGame = ({ email, onComplete }) => {
     score: 0
   });
 
-  
+  // set policies for the game
   const policies = [
     {
       id: 'fin-approval',
@@ -59,6 +59,7 @@ const PolicyVerificationGame = ({ email, onComplete }) => {
 
   
   useEffect(() => {
+    // set timer for the game
     if (!gameState.showTutorial && !gameState.isComplete && gameState.timeRemaining > 0) {
       const timer = setInterval(() => {
         setGameState(prev => ({
@@ -71,12 +72,14 @@ const PolicyVerificationGame = ({ email, onComplete }) => {
     }
   }, [gameState.showTutorial, gameState.isComplete, gameState.timeRemaining]);
 
+  // auto submit when time runs out
   useEffect(() => {
     if (gameState.timeRemaining === 0) {
       handleSubmit();
     }
   }, [gameState.timeRemaining]);
 
+  // toggle policy selection and adjust array
   const togglePolicy = (policyId) => {
     setGameState(prev => {
       const newSelected = new Set(prev.selectedPolicies);
@@ -93,6 +96,7 @@ const PolicyVerificationGame = ({ email, onComplete }) => {
   };
 
   const handleSubmit = () => {
+    // calculate score based on correct and incorrect selections
     const relevantPolicies = policies.filter(p => p.isRelevant);
     const correctSelections = [...gameState.selectedPolicies].filter(
       id => policies.find(p => p.id === id)?.isRelevant
@@ -259,7 +263,7 @@ const PolicyVerificationGame = ({ email, onComplete }) => {
   
   return (
     <div className="bg-white rounded-lg p-6">
-      {/* Timer and Progress */}
+      {/* timer and progress */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
           <div className="flex items-center gap-2">
@@ -281,10 +285,10 @@ const PolicyVerificationGame = ({ email, onComplete }) => {
         </div>
       </div>
 
-      {/* Email Preview */}
+      {/* email preview */}
       {renderEmailPreview()}
 
-      {/* Policy Selection */}
+      {/* policy selection */}
       <div className="space-y-4">
         <h3 className="font-medium">Select Relevant Security Policies:</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

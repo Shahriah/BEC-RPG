@@ -8,10 +8,12 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
   const [showHints, setShowHints] = useState(false);
   const [analysisScore, setAnalysisScore] = useState(0);
 
+
+  // this sets what is considered a red flag in an email
   const identifyRedFlags = (email) => {
     const redFlags = new Map();
 
-    
+    // domain name red flag
     if (!email.from.endsWith('@company.com')) {
       redFlags.set('domain', {
         text: email.from,
@@ -20,7 +22,7 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
       });
     }
 
-    
+    // email body red flags
     const urgencyWords = ['urgent', 'asap', 'immediately', 'today', 'quick'];
     urgencyWords.forEach(word => {
       if (email.content.toLowerCase().includes(word)) {
@@ -32,7 +34,7 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
       }
     });
 
-    
+    // symbols for payments red flag
     const moneyPattern = /\$[\d,]+(\.\d{2})?/g;
     const moneyMatches = email.content.match(moneyPattern);
     if (moneyMatches) {
@@ -43,7 +45,7 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
       });
     }
 
-    
+    // secret phrases red flag
     const secrecyPhrases = [
       'confidential',
       'don\'t discuss',
@@ -61,7 +63,7 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
       }
     });
 
-    
+    // banking phrases red flag
     const bankingPhrases = [
       'new account',
       'update bank',
@@ -84,27 +86,31 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
 
   const suspiciousElements = identifyRedFlags(email);
 
+  // this takes the number of red flags identified and calculates a score
   const calculateScore = () => {
-    let correctSelections = 0;
-    let totalFlags = suspiciousElements.size;
-
-    selectedFlags.forEach(flag => {
-      for (const [_, element] of suspiciousElements) {
-        if (flag.toLowerCase().includes(element.text.toLowerCase())) {
-          correctSelections++;
-          break;
-        }
+    let matchedCount = 0;
+    // iterate over each suspicious element only once
+    suspiciousElements.forEach((element) => {
+      // check if at least one selected flag matches this element
+      const isMatched = Array.from(selectedFlags).some(flag =>
+        flag.toLowerCase().includes(element.text.toLowerCase()) ||
+        element.text.toLowerCase().includes(flag.toLowerCase())
+      );
+      if (isMatched) {
+        matchedCount++;
       }
     });
-
-    return Math.round((correctSelections / totalFlags) * 100);
+    const totalFlags = suspiciousElements.size;
+    return totalFlags > 0 ? Math.round((matchedCount / totalFlags) * 100) : 0;
   };
-
+  
+  // deals with what has been selected within the email analysis
   const handleWordClick = (word) => {
     if (showFeedback) return;
 
     setSelectedFlags(prev => {
       const newFlags = new Set(prev);
+      // checks if the words selected are within the red flags
       if (newFlags.has(word)) {
         newFlags.delete(word);
       } else {
@@ -114,11 +120,12 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
     });
   };
 
+  // this renders the content of the email
   const renderContent = (text) => {
     return text.split(' ').map((word, index) => (
       <span
         key={index}
-        className={`cursor-pointer ${selectedFlags.has(word) ? 'bg-yellow-100' : ''}`}
+        className={`cursor-pointer ${selectedFlags.has(word) ? 'bg-amber-400' : ''}`}
         onClick={() => handleWordClick(word)}
       >
         {word}{' '}
@@ -127,7 +134,7 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
   };
 
 
-
+  // this is the function that handles the submission of the analysis
   const handleSubmitAnalysis = () => {
     const score = calculateScore();
     setAnalysisScore(score);
@@ -137,7 +144,7 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
   return (
     <div className="bg-white rounded-lg">
       <div className="border rounded-lg p-4 mb-4 max-h-[500px] overflow-y-auto">
-        {/* Email Header */}
+        {/* header of email */}
         <div className="border-b border-gray-200 pb-4 mb-4">
           <div className="space-y-2 font-mono text-sm">
             <div className="grid grid-cols-[100px_1fr] gap-2">
@@ -156,7 +163,7 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
           </div>
         </div>
 
-        {/* Email Body */}
+        {/* body of email */}
         <div className="whitespace-pre-wrap text-sm leading-relaxed">
           <p className="mb-4">Dear {renderContent("Finance Team")},</p>
           <p className="mb-4">
@@ -212,7 +219,7 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
           </>
         ) : (
           <div className="space-y-4">
-            {/* Score Display */}
+            {/* score */}
             <div className="bg-blue-50 rounded-lg p-4">
               <h3 className="font-semibold text-lg mb-2">Analysis Results</h3>
               <div className="space-y-2">
@@ -226,7 +233,7 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
               </div>
             </div>
 
-            {/* Identified Red Flags */}
+            {/* red flags found */}
             <div className="bg-red-50 rounded-lg p-4">
               <h3 className="font-semibold mb-2 text-red-800">Red Flags Found:</h3>
               <ul className="space-y-1">

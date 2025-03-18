@@ -1,4 +1,3 @@
-// components/games/DataSecurityGame.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -30,27 +29,35 @@ const DataSecurityGame = () => {
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [gameStats, setGameStats] = useState(null);
 
+  // deals with user's selections
   const handleChoice = (category, value) => {
     setSelectedChoices(prev => ({
       ...prev,
       [category]: value
     }));
   };
-
+  // function to calculate users points dependent upon their answers
   const checkAnswers = async () => {
     const currentScen = scenarios[currentScenario];
+
+    // finds number of corrcet responses
     const correctCount = Object.keys(selectedChoices).filter(
       key => selectedChoices[key] === currentScen.correctChoices[key]
     ).length;
 
     const pointsEarned = correctCount * 10;
     setScore(prev => prev + pointsEarned);
+
+    //displays feedback
     setShowFeedback(true);
 
+
+    // if the user has completed all the scenarios then the final score is calculated
     if (currentScenario === scenarios.length - 1) {
       const finalScore = Math.round(((score + pointsEarned) / (scenarios.length * 30)) * 100);
       const timeSpent = Date.now() - startTime;
-
+      
+      // send a complete request to backend to update the testuser's score
       try {
         const response = await fetch('http://localhost:5000/api/missions/complete', {
           method: 'POST',
@@ -66,6 +73,8 @@ const DataSecurityGame = () => {
         });
 
         const data = await response.json();
+
+        // updates stats for entire game
         setGameStats({
           score: finalScore,
           timeSpent,
@@ -80,6 +89,7 @@ const DataSecurityGame = () => {
     }
   };
 
+  // moves to next scenario
   const handleNextScenario = () => {
     setCurrentScenario(prev => prev + 1);
     setSelectedChoices({
@@ -90,12 +100,12 @@ const DataSecurityGame = () => {
     setShowFeedback(false);
   };
 
-  // Tutorial Modal
+  // game tutorial
   const renderTutorial = () => (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-4 overflow-hidden">
         <div className="grid md:grid-cols-2">
-          {/* Left Side - Informative Content */}
+          {/* left side */}
           <div className="bg-blue-600 text-white p-8 flex flex-col justify-center">
             <div className="mb-6">
               <Lock className="w-16 h-16 text-white mb-4" strokeWidth={1.5} />
@@ -135,7 +145,7 @@ const DataSecurityGame = () => {
             </div>
           </div>
           
-          {/* Right Side - Mission Details */}
+          {/* right side */}
           <div className="p-8">
             <div className="mb-6">
               <h3 className="text-2xl font-bold mb-2">Your Mission</h3>
@@ -178,9 +188,9 @@ const DataSecurityGame = () => {
   );
 
   return (
-    <div className="min-h-screen bg-slate-100 p-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Navigation */}
+    <div className="min-h-screen bg-slate-100 p-4 overflow-y-auto">
+      <div className="max-w-4xl w-full mx-auto">
+        {/* button to take you back to home */}
         <button 
           onClick={() => navigate('/')}
           className="flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-4"
@@ -189,10 +199,10 @@ const DataSecurityGame = () => {
           Back to Missions
         </button>
 
-        {/* Header */}
+        {/* header */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-center justify-between">
+            <div className="flex items-center gap-2 mb-2 sm:mb-0">
               <Shield className="w-6 h-6 text-blue-600" />
               <div>
                 <h1 className="text-2xl font-bold">Data Guardian</h1>
@@ -208,7 +218,7 @@ const DataSecurityGame = () => {
           </div>
         </div>
 
-        {/* Progress */}
+        {/* progress for scenarios */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-gray-600">Progress</span>
@@ -224,12 +234,12 @@ const DataSecurityGame = () => {
           </div>
         </div>
 
-        {/* Main Game Area */}
+        {/* main area for game */}
         <div className="bg-white rounded-lg shadow-lg p-6">
-          {/* Scenario */}
+          {/* current scenario */}
           <ScenarioCard scenario={scenarios[currentScenario]} />
 
-          {/* Choices */}
+          {/* selections */}
           <div className="mt-6">
             <ChoiceSelector
               title="Data Classification"
@@ -262,14 +272,14 @@ const DataSecurityGame = () => {
               <button
                 onClick={checkAnswers}
                 disabled={!selectedChoices.classification || !selectedChoices.access || !selectedChoices.security}
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed mt-4"
               >
                 Submit Decisions
               </button>
             )}
           </div>
 
-          {/* Feedback */}
+          {/* immediate feedback */}
           {showFeedback && (
             <FeedbackPanel
               choices={selectedChoices}
@@ -281,57 +291,45 @@ const DataSecurityGame = () => {
           )}
         </div>
 
-        {/* Tutorial Modal */}
+        {/* displays tutorial at start of game */}
         {showTutorial && renderTutorial()}
 
-        {/* Completion Modal */}
+        {/* screen to display completion */}
         {showCompletionModal && gameStats && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-              <div className="flex items-center gap-2 mb-4">
-                <Trophy className="w-8 h-8 text-yellow-500" />
-                <h2 className="text-2xl font-bold">Mission Complete!</h2>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-lg mb-2">Your Results</h3>
-                  <div className="space-y-2">
-                    <p>Final Score: {gameStats.score}%</p>
-                    <p>Time: {Math.round(gameStats.timeSpent / 1000)}s</p>
-                    <p>Points Earned: {gameStats.pointsEarned}</p>
-                    <p>New Rank: {gameStats.newRank}</p>
-                  </div>
-                </div>
-
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">Key Learning Points:</h3>
-                  <ul className="list-disc list-inside space-y-1 text-sm">
-                    <li>Proper data classification is crucial for security</li>
-                    <li>Access controls should follow least privilege principle</li>
-                    <li>Security measures must match data sensitivity</li>
-                    <li>Consider both internal and external sharing requirements</li>
-                    <li>Always follow established security protocols</li>
-                  </ul>
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => navigate('/')}
-                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                  >
-                    Return to Missions
-                  </button>
-                  <button
-                    onClick={() => window.location.reload()}
-                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
-                  >
-                    Try Again
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+             <div className="flex items-center gap-2 mb-4">
+               <Trophy className="w-8 h-8 text-yellow-500" />
+               <h2 className="text-2xl font-bold">Mission Complete!</h2>
+             </div>
+     
+             <div className="bg-blue-50 p-4 rounded-lg">
+               <h3 className="font-semibold text-lg mb-2">Your Results</h3>
+               <div className="space-y-2">
+                {/* shows game stats and calculates time spent */}
+                 <p>Final Score: {gameStats.score}%</p>
+                 <p>Time Spent: {Math.round(gameStats.timeSpent / 1000)}s</p>
+                 <p>Points Earned: {gameStats.pointsEarned}</p>
+                 <p>New Rank: {gameStats.newRank}</p>
+               </div>
+             </div>
+     
+             <div className="flex gap-2 mt-6">
+               <button
+                 onClick={() => navigate('/')}
+                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+               >
+                 Return to Missions
+               </button>
+               <button
+                 onClick={() => window.location.reload()}
+                 className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+               >
+                 Try Again
+               </button>
+             </div>
+           </div>
+         </div>
         )}
       </div>
     </div>

@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 
 const CheckSenderGame = ({ email, onComplete }) => {
+  // define steps for sender verification
   const verificationSteps = [
     {
       id: 'verify-domain',
@@ -48,7 +49,7 @@ const CheckSenderGame = ({ email, onComplete }) => {
       scoreImpact: 20
     }
   ];
-
+  // define initial game state
   const [gameState, setGameState] = useState({
     step: 'intro',
     score: 0,
@@ -59,6 +60,7 @@ const CheckSenderGame = ({ email, onComplete }) => {
     isComplete: false 
   });
 
+  // handle step selection
   const handleStepSelect = (stepId) => {
     setGameState(prev => ({
       ...prev,
@@ -66,12 +68,16 @@ const CheckSenderGame = ({ email, onComplete }) => {
     }));
   };
 
+  // handle step reordering
   const handleStepReorder = (targetIndex) => {
     if (gameState.selectedStep === null) return;
-
+    // clone current steps array
     const currentSteps = [...gameState.currentSteps];
+    // find index of selected step  
     const sourceIndex = currentSteps.findIndex(step => step.id === gameState.selectedStep);
+    // remove selected step from current steps
     const [removedStep] = currentSteps.splice(sourceIndex, 1);
+    // insert removed step at target index
     currentSteps.splice(targetIndex, 0, removedStep);
 
     setGameState(prev => ({
@@ -85,14 +91,14 @@ const CheckSenderGame = ({ email, onComplete }) => {
     let score = 100;
     let mistakes = 0;
 
-    
+    // compare current steps with verification steps
     gameState.currentSteps.forEach((step, index) => {
       if (step.id !== verificationSteps[index].id) {
         score -= 20;
         mistakes++;
       }
     });
-
+    // update game state with score and mistakes
     setGameState(prev => ({
       ...prev,
       score,
@@ -100,7 +106,7 @@ const CheckSenderGame = ({ email, onComplete }) => {
       isComplete: true 
     }));
 
-    
+    // call onComplete callback with final score
     onComplete(Math.max(0, score));
   };
 

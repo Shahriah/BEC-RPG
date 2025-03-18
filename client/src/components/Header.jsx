@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Shield, Trophy } from 'lucide-react';
 
@@ -6,8 +5,8 @@ const Header = ({ completedMissions, totalMissions, rank }) => {
   return (
     <header className="bg-blue-600 shadow-lg">
       <div className="max-w-7xl mx-auto p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-center justify-between">
+          <div className="flex items-center gap-3 mb-2 sm:mb-0">
             <Shield className="w-8 h-8 text-white" />
             <div>
               <h1 className="text-2xl font-bold text-white">Cyber Defense Training</h1>

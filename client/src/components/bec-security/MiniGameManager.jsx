@@ -16,17 +16,20 @@ const MiniGameManager = ({ email, onComplete }) => {
   const handleGameComplete = (gameType, score) => {
     const newScores = {
       ...gameState.scores,
-      [gameType]: score
+      [gameType]: score || 0 
     };
   
+    // if the game is the last step, calculate the total score and call the onComplete callback
     if (gameType === VerificationGameType.CONTACT_SUPERVISOR) {
-      
-      const totalScore = Math.round(Object.values(newScores).reduce((sum, s) => sum + s, 0) / 3);
-      
-      
+      // ensures a valid number score
+      const scoreValues = Object.values(newScores).filter(s => typeof s === "number" && !isNaN(s));
+      // calculate the average score
+      const totalScore = scoreValues.length > 0 
+        ? Math.round(scoreValues.reduce((sum, s) => sum + s, 0) / scoreValues.length) 
+        : 0; 
+  
       onComplete(gameType, totalScore);
     } else {
-      
       setGameState(prev => ({
         ...prev,
         scores: newScores,
@@ -34,6 +37,7 @@ const MiniGameManager = ({ email, onComplete }) => {
       }));
     }
   };
+  
 
   const handleTransitionContinue = () => {
     let nextStep;
@@ -123,7 +127,7 @@ const MiniGameManager = ({ email, onComplete }) => {
 
   return (
     <div>
-      {/* Progress Tracker */}
+      {/* progress tracker */}
       <div className="mb-6">
         <h2 className="text-lg font-semibold mb-4">Verification Steps</h2>
         <div className="grid grid-cols-3 gap-4">
@@ -162,7 +166,7 @@ const MiniGameManager = ({ email, onComplete }) => {
         </div>
       </div>
 
-      {/* Current Game */}
+      {/* current game */}
       {renderCurrentGame()}
     </div>
   );

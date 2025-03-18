@@ -23,7 +23,7 @@ const InsiderThreatGame = () => {
   const location = useLocation();
   const roleId = location.state?.roleId;
   const roleName = location.state?.roleName;
-
+  // set states for the game
   const [startTime] = useState(Date.now());
   const [currentScenario, setCurrentScenario] = useState(0);
   const [showTutorial, setShowTutorial] = useState(true);
@@ -33,7 +33,7 @@ const InsiderThreatGame = () => {
   const [investigatedActivities, setInvestigatedActivities] = useState(new Set());
   const [feedbackModal, setFeedbackModal] = useState(null);
 
-  // Get scenarios for the selected role
+  // retrieve scenarios for the selected role
   const roleScenarios = InsiderScenarios[roleId?.toUpperCase()] || [];
 
   useEffect(() => {
@@ -48,44 +48,36 @@ const InsiderThreatGame = () => {
 
   const handleFlagActivity = async (activityId, isSuspicious) => {
     if (!investigatedActivities.has(activityId)) {
-      // Find the current scenario's activities
+      // find the current scenario's activities
       const currentScenarioActivities = roleScenarios[currentScenario].activities;
-      
-      // Find the specific activity
+      // find the specific activity
       const activity = currentScenarioActivities.find(a => a.id === activityId);
-      
       if (activity) {
-        // Check if the activity has suspicious factors (based on timeline)
+        // check if the activity has suspicious factors (based on timeline)
         const hasSuspiciousFactors = activity.timeline.some(item => !item.isNormal);
         const isCorrect = isSuspicious === hasSuspiciousFactors;
-        
         const scoreChange = isCorrect ? 10 : -5;
         setScore(prev => prev + scoreChange);
-        
         const newInvestigated = new Set(investigatedActivities).add(activityId);
         setInvestigatedActivities(newInvestigated);
   
-        // Close the selected activity when showing feedback
+        // close the selected activity when showing feedback
         setSelectedActivity(null);
   
-        // Check if all activities in current scenario are investigated
-        const allInvestigated = currentScenarioActivities.every(a => 
-          newInvestigated.has(a.id)
-        );
+        // check if all activities in current scenario are investigated
+        const allInvestigated = currentScenarioActivities.every(a => newInvestigated.has(a.id));
         const feedback = getInsiderThreatFeedback(roleId.toUpperCase(), isCorrect);
         setFeedbackModal(feedback);
         
         if (allInvestigated) {
           setTimeout(async () => {
             if (currentScenario === roleScenarios.length - 1) {
-              // Game complete
+              // game has been completed
               try {
                 const finalScore = Math.round((score / (roleScenarios.length * 20)) * 100);
-                const response = await fetch('http://localhost:5000/api/missions/complete', {
+                await fetch('http://localhost:5000/api/missions/complete', {
                   method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
+                  headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
                     username: 'testuser',
                     missionId: 'insider-threat',
@@ -93,13 +85,12 @@ const InsiderThreatGame = () => {
                     timeSpent: Date.now() - startTime
                   }),
                 });
-  
                 setShowCompletionModal(true);
               } catch (error) {
                 console.error('Error saving progress:', error);
               }
             } else {
-              // Move to next scenario
+              // progress to next scenario
               setCurrentScenario(prev => prev + 1);
               setInvestigatedActivities(new Set());
             }
@@ -110,42 +101,42 @@ const InsiderThreatGame = () => {
   };
 
   const ActivityCard = ({ activity }) => (
-    <div className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
-      <div className="flex justify-between items-start mb-4">
+    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg transition-shadow">
+      <div className="flex flex-col sm:flex-row justify-between items-start mb-4">
         <div className="flex items-start gap-3">
           <div className="p-2 rounded-lg bg-blue-100">
-            <activity.icon className="w-5 h-5 text-blue-600" />
+            <activity.icon className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
           </div>
           <div>
-            <h3 className="font-semibold">{activity.employee}</h3>
-            <p className="text-sm text-gray-600">{activity.department}</p>
+            <h3 className="font-semibold text-sm sm:text-base">{activity.employee}</h3>
+            <p className="text-xs sm:text-sm text-gray-600">{activity.department}</p>
           </div>
         </div>
-        <span className="text-sm text-gray-500">{activity.timestamp}</span>
+        <span className="text-xs sm:text-sm text-gray-500">{activity.timestamp}</span>
       </div>
 
-      <p className="text-sm mb-4">{activity.details}</p>
+      <p className="text-xs sm:text-sm mb-4">{activity.details}</p>
 
       {!investigatedActivities.has(activity.id) ? (
-        <div className="flex justify-between">
+        <div className="flex flex-col sm:flex-row gap-2">
           <button
             onClick={() => handleInvestigate(activity)}
-            className="px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 flex items-center gap-2"
+            className="px-3 py-1.5 text-xs sm:text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 flex items-center gap-2"
           >
             <Search className="w-4 h-4" />
             Investigate
           </button>
-          <div className="space-x-2">
+          <div className="space-x-0 sm:space-x-2 space-y-2 sm:space-y-0">
             <button
               onClick={() => handleFlagActivity(activity.id, true)}
-              className="px-3 py-1.5 text-sm bg-red-50 text-red-700 rounded-lg hover:bg-red-100 flex items-center gap-2"
+              className="px-3 py-1.5 text-xs sm:text-sm bg-red-50 text-red-700 rounded-lg hover:bg-red-100 flex items-center gap-2"
             >
               <AlertTriangle className="w-4 h-4" />
               Flag Suspicious
             </button>
             <button
               onClick={() => handleFlagActivity(activity.id, false)}
-              className="px-3 py-1.5 text-sm bg-green-50 text-green-700 rounded-lg hover:bg-green-100 flex items-center gap-2"
+              className="px-3 py-1.5 text-xs sm:text-sm bg-green-50 text-green-700 rounded-lg hover:bg-green-100 flex items-center gap-2"
             >
               <Check className="w-4 h-4" />
               Mark Normal
@@ -153,25 +144,25 @@ const InsiderThreatGame = () => {
           </div>
         </div>
       ) : (
-        <div className="flex justify-between items-center text-sm text-gray-500">
+        <div className="flex justify-between items-center text-xs sm:text-sm text-gray-500">
           <span>Investigation complete</span>
           <Shield className="w-4 h-4" />
         </div>
       )}
     </div>
   );
-
+  // investigation panel for the selected activity
   const InvestigationPanel = () => {
     if (!selectedActivity) return null;
 
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg max-w-3xl w-full">
-          <div className="p-6">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h2 className="text-xl font-bold">{selectedActivity.employee}</h2>
-                <p className="text-sm text-gray-600">{selectedActivity.department}</p>
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 overflow-y-auto">
+        <div className="bg-white rounded-lg max-w-3xl w-full my-8 max-h-[90vh] overflow-y-auto">
+          <div className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start mb-4">
+              <div className="mb-4 sm:mb-0">
+                <h2 className="text-xl sm:text-2xl font-bold">{selectedActivity.employee}</h2>
+                <p className="text-xs sm:text-sm text-gray-600">{selectedActivity.department}</p>
               </div>
               <button
                 onClick={() => setSelectedActivity(null)}
@@ -183,22 +174,22 @@ const InsiderThreatGame = () => {
 
             <TimelineAnalysisView activity={selectedActivity} />
 
-            <div className="flex justify-end gap-2 mt-4">
+            <div className="flex flex-col sm:flex-row justify-end gap-2 mt-4">
               <button
                 onClick={() => setSelectedActivity(null)}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-xs sm:text-sm"
               >
                 Close Investigation
               </button>
               <button
                 onClick={() => handleFlagActivity(selectedActivity.id, true)}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-xs sm:text-sm"
               >
                 Flag as Suspicious
               </button>
               <button
                 onClick={() => handleFlagActivity(selectedActivity.id, false)}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-xs sm:text-sm"
               >
                 Mark as Normal
               </button>
@@ -210,42 +201,42 @@ const InsiderThreatGame = () => {
   };
 
   const renderTutorial = () => (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-4 overflow-hidden">
         <div className="grid md:grid-cols-2">
-          {/* Left Side - Informative Content */}
-          <div className="bg-blue-600 text-white p-8 flex flex-col justify-center">
-            <div className="mb-6">
-              <Users className="w-16 h-16 text-white mb-4" strokeWidth={1.5} />
-              <h2 className="text-3xl font-bold mb-4">Insider Threat Simulator</h2>
+          {/* left side */}
+          <div className="bg-blue-600 text-white p-4 sm:p-8 flex flex-col justify-center">
+            <div className="mb-4 sm:mb-6">
+              <Users className="w-12 h-12 sm:w-16 sm:h-16 text-white mb-4" strokeWidth={1.5} />
+              <h2 className="text-2xl sm:text-3xl font-bold mb-4">Insider Threat Simulator</h2>
             </div>
             
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <Shield className="w-6 h-6 mt-1 flex-shrink-0" />
+            <div className="space-y-3 sm:space-y-4">
+              <div className="flex items-start gap-2">
+                <Shield className="w-5 h-5 sm:w-6 sm:h-6 mt-1 flex-shrink-0" />
                 <div>
-                  <h3 className="font-semibold text-lg">Cybersecurity Challenge</h3>
-                  <p className="text-sm text-blue-100">
+                  <h3 className="font-semibold text-sm sm:text-base">Cybersecurity Challenge</h3>
+                  <p className="text-xs sm:text-sm text-blue-100">
                     Develop critical skills in detecting and preventing insider threats.
                   </p>
                 </div>
               </div>
               
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="w-6 h-6 mt-1 flex-shrink-0" />
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 mt-1 flex-shrink-0" />
                 <div>
-                  <h3 className="font-semibold text-lg">Real-World Scenarios</h3>
-                  <p className="text-sm text-blue-100">
+                  <h3 className="font-semibold text-sm sm:text-base">Real-World Scenarios</h3>
+                  <p className="text-xs sm:text-sm text-blue-100">
                     Experience authentic insider threat scenarios from different organizational roles.
                   </p>
                 </div>
               </div>
               
-              <div className="flex items-start gap-3">
-                <Info className="w-6 h-6 mt-1 flex-shrink-0" />
+              <div className="flex items-start gap-2">
+                <Info className="w-5 h-5 sm:w-6 sm:h-6 mt-1 flex-shrink-0" />
                 <div>
-                  <h3 className="font-semibold text-lg">Continuous Learning</h3>
-                  <p className="text-sm text-blue-100">
+                  <h3 className="font-semibold text-sm sm:text-base">Continuous Learning</h3>
+                  <p className="text-xs sm:text-sm text-blue-100">
                     Gain insights into threat detection, pattern recognition, and security best practices.
                   </p>
                 </div>
@@ -253,17 +244,17 @@ const InsiderThreatGame = () => {
             </div>
           </div>
           
-          {/* Right Side - Role and Mission Details */}
-          <div className="p-8">
-            <div className="mb-6">
-              <h3 className="text-2xl font-bold mb-2">Your Mission: {roleName}</h3>
-              <p className="text-gray-600 mb-4">
+          {/* right side */}
+          <div className="p-4 sm:p-8">
+            <div className="mb-4">
+              <h3 className="text-xl sm:text-2xl font-bold mb-2">Your Mission: {roleName}</h3>
+              <p className="text-xs sm:text-sm text-gray-600 mb-4">
                 As a {roleName}, you are tasked with monitoring and investigating potential insider threats within your organization.
               </p>
               
-              <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4">
-                <h4 className="font-semibold mb-2">Mission Objectives</h4>
-                <ul className="list-disc list-inside space-y-2 text-sm text-gray-700">
+              <div className="bg-yellow-50 border-l-4 border-yellow-500 p-3 sm:p-4 mb-4">
+                <h4 className="font-semibold mb-1 text-sm sm:text-base">Mission Objectives</h4>
+                <ul className="list-disc list-inside space-y-1 text-xs sm:text-sm text-gray-700">
                   <li>Analyze employee activity patterns</li>
                   <li>Identify suspicious behavioral changes</li>
                   <li>Protect organizational assets and information</li>
@@ -271,9 +262,9 @@ const InsiderThreatGame = () => {
                 </ul>
               </div>
               
-              <div className="bg-green-50 border-l-4 border-green-500 p-4">
-                <h4 className="font-semibold mb-2">Key Skills You'll Develop</h4>
-                <ul className="list-disc list-inside space-y-2 text-sm text-gray-700">
+              <div className="bg-green-50 border-l-4 border-green-500 p-3 sm:p-4">
+                <h4 className="font-semibold mb-1 text-sm sm:text-base">Key Skills You'll Develop</h4>
+                <ul className="list-disc list-inside space-y-1 text-xs sm:text-sm text-gray-700">
                   <li>Pattern recognition</li>
                   <li>Contextual analysis</li>
                   <li>Risk assessment</li>
@@ -284,7 +275,7 @@ const InsiderThreatGame = () => {
             
             <button
               onClick={() => setShowTutorial(false)}
-              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 text-xs sm:text-sm"
             >
               <Play className="w-5 h-5" />
               Begin Insider Threat Investigation
@@ -319,7 +310,7 @@ const InsiderThreatGame = () => {
     <>
       <div className="min-h-screen bg-slate-100 p-4">
         <div className="max-w-7xl mx-auto">
-          {/* Navigation */}
+          {/* return back to home */}
           <button 
             onClick={() => navigate('/')}
             className="flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-4"
@@ -328,32 +319,30 @@ const InsiderThreatGame = () => {
             Back to Missions
           </button>
   
-          {/* Header */}
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+          {/* header */}
+          <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 mb-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between">
+              <div className="flex items-center gap-2 mb-2 sm:mb-0">
                 <Users className="w-6 h-6 text-blue-600" />
                 <div>
-                  <h1 className="text-2xl font-bold">Insider Threat Monitor</h1>
-                  <p className="text-sm text-gray-600">
+                  <h1 className="text-xl sm:text-2xl font-bold">Insider Threat Monitor</h1>
+                  <p className="text-xs sm:text-sm text-gray-600">
                     Role: {roleName} - {roleScenarios[currentScenario].title}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-gray-500" />
-                  <span className="font-medium">Score: {score}</span>
-                </div>
+              <div className="flex items-center gap-2">
+                <Shield className="w-5 h-5 text-gray-500" />
+                <span className="font-medium text-xs sm:text-sm">Score: {score}</span>
               </div>
             </div>
           </div>
   
-          {/* Main Game Area */}
+          {/* main game */}
           <div className="space-y-4">
-            <div className="bg-blue-50 p-4 rounded-lg mb-4">
-              <h2 className="font-semibold mb-2">{roleScenarios[currentScenario].description}</h2>
-              <div className="flex items-center gap-2 text-sm text-blue-800">
+            <div className="bg-blue-50 p-4 sm:p-6 rounded-lg mb-4">
+              <h2 className="font-semibold mb-2 text-xs sm:text-sm">{roleScenarios[currentScenario].description}</h2>
+              <div className="flex items-center gap-2 text-xs sm:text-sm text-blue-800">
                 <Info className="w-4 h-4" />
                 <p>Investigate patterns and identify suspicious behavior changes.</p>
               </div>
@@ -364,7 +353,7 @@ const InsiderThreatGame = () => {
             ))}
           </div>
   
-          {/* Investigation Panel */}
+          {/* investigation panel */}
           {selectedActivity && (
             <InvestigationPanel 
               activity={selectedActivity}
@@ -374,12 +363,12 @@ const InsiderThreatGame = () => {
             />
           )}
   
-          {/* Tutorial Modal */}
+          {/* show the tutorial */}
           {showTutorial && renderTutorial()}
   
-          {/* Completion Modal */}
+          {/* show the completion information */}
           {showCompletionModal && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
               <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
                 <div className="flex items-center gap-2 mb-4">
                   <Trophy className="w-8 h-8 text-yellow-500" />
@@ -390,14 +379,14 @@ const InsiderThreatGame = () => {
                   <div className="bg-blue-50 p-4 rounded-lg">
                     <h3 className="font-semibold text-lg mb-2">Your Results</h3>
                     <div className="space-y-2">
-                      <p>Final Score: {Math.round((score / (roleScenarios.length * 20)) * 100)}%</p>
-                      <p>Time: {Math.round((Date.now() - startTime) / 1000)}s</p>
+                      <p className="text-xs sm:text-sm">Final Score: {Math.round((score / (roleScenarios.length * 20)) * 100)}%</p>
+                      <p className="text-xs sm:text-sm">Time: {Math.round((Date.now() - startTime) / 1000)}s</p>
                     </div>
                   </div>
   
                   <div className="bg-green-50 p-4 rounded-lg">
-                    <h3 className="font-semibold mb-2">Key Pattern Recognition Skills:</h3>
-                    <ul className="list-disc list-inside space-y-1 text-sm">
+                    <h3 className="font-semibold mb-2 text-xs sm:text-sm">Key Pattern Recognition Skills:</h3>
+                    <ul className="list-disc list-inside space-y-1 text-xs sm:text-sm">
                       <li>Identifying behavioral changes over time</li>
                       <li>Analyzing activity patterns and context</li>
                       <li>Recognizing suspicious pattern combinations</li>
@@ -408,13 +397,13 @@ const InsiderThreatGame = () => {
                   <div className="flex gap-2">
                     <button
                       onClick={() => navigate('/')}
-                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-xs sm:text-sm"
                     >
                       Return to Missions
                     </button>
                     <button
-                      onClick={() => window.location.reload()}
-                      className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+                      onClick={() => navigate('/')}
+                      className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 text-xs sm:text-sm"
                     >
                       Try Again
                     </button>
@@ -426,7 +415,6 @@ const InsiderThreatGame = () => {
         </div>
       </div>
   
-      {/* Feedback Modal - Outside main container */}
       {feedbackModal && (
         <InsiderThreatFeedbackModal 
           feedback={feedbackModal} 
@@ -438,4 +426,3 @@ const InsiderThreatGame = () => {
 };
 
 export default InsiderThreatGame;
-                    

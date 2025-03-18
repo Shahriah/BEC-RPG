@@ -17,6 +17,8 @@ import { EmailViewer, ActionPanel, FeedbackPanel } from './BecEmailViewer';
 import MiniGameManager from './MiniGameManager';
 
 const BECSecurityGame = () => {
+
+  // set game states
   const navigate = useNavigate();
   const [startTime] = useState(Date.now());
   const [score, setScore] = useState(0);
@@ -29,6 +31,7 @@ const BECSecurityGame = () => {
 
   const handleGameComplete = async (finalScore) => {
     try {
+      // save the final score after submitting to backend
       const response = await fetch('http://localhost:5000/api/missions/complete', {
         method: 'POST',
         headers: {
@@ -59,16 +62,16 @@ const BECSecurityGame = () => {
   };
 
   const handleVerificationComplete = async (stepType, stepScore) => {
-    // Update scores
+    // update scores
     const newScores = {
       ...verificationScores,
       [stepType]: stepScore
     };
     setVerificationScores(newScores);
     
-    // Check if this was the final verification game (ContactSupervisor)
+    // check if this was the final verification game (ContactSupervisor)
     if (stepType === VerificationGameType.CONTACT_SUPERVISOR) {
-      // Calculate overall verification score
+      // calculate overall verification score
       let verificationPoints = Object.values(newScores).reduce((sum, score) => sum + score, 0);
       let finalScore = Math.round(verificationPoints / 3); // Average of 3 games
       
@@ -97,10 +100,10 @@ const BECSecurityGame = () => {
           });
           setScore(finalScore);
           
-          // Move to the next game phase
+          // move to the next game phase
           setGamePhase('action');
           
-          // Optionally, show the completion modal
+          // optionally, show the completion modal
           setShowCompletionModal(true);
         }
       } catch (error) {
@@ -153,7 +156,7 @@ const BECSecurityGame = () => {
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-4 overflow-hidden">
         <div className="grid md:grid-cols-2">
-          {/* Left Side - Informative Content */}
+          {/* left side */}
           <div className="bg-blue-600 text-white p-8 flex flex-col justify-center">
             <div className="mb-6">
               <Mail className="w-16 h-16 text-white mb-4" strokeWidth={1.5} />
@@ -193,7 +196,7 @@ const BECSecurityGame = () => {
             </div>
           </div>
           
-          {/* Right Side - Mission Details */}
+          {/* right side */}
           <div className="p-8">
             <div className="mb-6">
               <h3 className="text-2xl font-bold mb-2">Your Mission</h3>

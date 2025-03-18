@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { AlertTriangle, Clock, Shield, Check, X } from 'lucide-react';
 
@@ -20,28 +19,30 @@ const ActivityCard = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
-      <div className="flex justify-between items-start mb-4">
+    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg transition-shadow">
+      <div className="flex flex-col sm:flex-row justify-between items-start mb-4">
         <div className="flex items-start gap-3">
           <div className={`p-2 rounded-lg ${
             activity.riskScore > 70 ? 'bg-red-100' :
             activity.riskScore > 40 ? 'bg-yellow-100' :
             'bg-green-100'
           }`}>
-            <Icon className="w-5 h-5 text-gray-700" />
+            <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
           </div>
           <div>
-            <h3 className="font-semibold">{activity.employee}</h3>
-            <p className="text-sm text-gray-600">{activity.department} • {activity.accessLevel}</p>
+            <h3 className="font-semibold text-sm sm:text-base">{activity.employee}</h3>
+            <p className="text-xs sm:text-sm text-gray-600">
+              {activity.department} • {activity.accessLevel}
+            </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mt-2 sm:mt-0">
           <Clock className="w-4 h-4 text-gray-500" />
-          <span className="text-sm text-gray-600">{activity.timestamp}</span>
+          <span className="text-xs sm:text-sm text-gray-600">{activity.timestamp}</span>
         </div>
       </div>
 
-      <p className="text-sm mb-4">{activity.details}</p>
+      <p className="text-xs sm:text-sm mb-4">{activity.details}</p>
 
       {activity.flags && isFlagged && (
         <div className="flex flex-wrap gap-2 mb-4">
@@ -58,16 +59,16 @@ const ActivityCard = ({
       )}
 
       {!showFeedback ? (
-        <div className="flex justify-between">
+        <div className="flex flex-col sm:flex-row gap-2">
           <button
             onClick={() => onInvestigate(activity.id)}
-            className="px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100"
+            className="px-3 py-1.5 text-xs sm:text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100"
           >
             Investigate
           </button>
           <button
             onClick={() => onFlag(activity.id)}
-            className={`px-3 py-1.5 text-sm rounded-lg ${
+            className={`px-3 py-1.5 text-xs sm:text-sm rounded-lg ${
               isFlagged 
                 ? 'bg-red-100 text-red-700' 
                 : 'bg-red-50 text-red-700 hover:bg-red-100'
@@ -77,7 +78,7 @@ const ActivityCard = ({
           </button>
           <button
             onClick={handleAnalyze}
-            className="px-3 py-1.5 text-sm bg-green-50 text-green-700 rounded-lg hover:bg-green-100"
+            className="px-3 py-1.5 text-xs sm:text-sm bg-green-50 text-green-700 rounded-lg hover:bg-green-100"
           >
             Complete Analysis
           </button>
@@ -89,17 +90,18 @@ const ActivityCard = ({
               ? 'bg-green-50 border border-green-200'
               : 'bg-red-50 border border-red-200'
           }`}>
-            <div className="flex items-start gap-2">
+            <div className="flex flex-col sm:flex-row items-start gap-2">
               {(activity.isSuspicious && isFlagged) || (!activity.isSuspicious && !isFlagged) ? (
                 <Check className="w-5 h-5 text-green-600 mt-0.5" />
               ) : (
                 <X className="w-5 h-5 text-red-600 mt-0.5" />
               )}
               <div>
-                <p className="font-medium">
+                <p className="font-medium text-sm">
                   {activity.isSuspicious ? 'This was suspicious activity!' : 'This was normal activity.'}
                 </p>
-                <p className="text-sm mt-1">
+                <p className="text-xs sm:text-sm mt-1">
+                  {/*feedback message*/}
                   {activity.isSuspicious
                     ? isFlagged
                       ? 'Good catch! You correctly identified the suspicious behavior.'
@@ -115,7 +117,7 @@ const ActivityCard = ({
             {activity.isSuspicious && (
               <div className="mt-3">
                 <p className="font-medium text-sm">Key Indicators:</p>
-                <ul className="list-disc list-inside text-sm mt-1">
+                <ul className="list-disc list-inside text-xs sm:text-sm mt-1">
                   {activity.flags?.map((flag, index) => (
                     <li key={index} className="text-gray-700">{flag}</li>
                   ))}
