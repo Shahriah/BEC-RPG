@@ -160,6 +160,7 @@ describe('Insider Threat Scenarios', () => {
             expect(t).toHaveProperty('details');
             expect(t).toHaveProperty('location');
             expect(t).toHaveProperty('isNormal');
+            // alerts are only present for abnormal activities
             if (!t.isNormal && t.alerts !== undefined) {
               expect(Array.isArray(t.alerts)).toBe(true);
             }

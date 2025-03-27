@@ -3,7 +3,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Dashboard from '../../components/Dashboard';
 
-// Updated mocks as plain functional components
+// mock all functions used within the dashboard
 
 jest.mock('../../components/Header', () => {
   return function Header({ completedMissions, totalMissions, rank }) {
@@ -105,7 +105,6 @@ describe('Dashboard Component', () => {
     jest.clearAllMocks();
     localStorageMock.clear();
     
-    // Default fetch mock returns defaultUserData
     global.fetch = jest.fn(() =>
       Promise.resolve({
         ok: true,
@@ -267,8 +266,6 @@ describe('Dashboard Component', () => {
     expect(progressCard).toHaveTextContent('Progress: 0% - Points: 100');
   });
 
-  // ---- New tests to cover remaining lines ----
-
   test('unlocks "insider-threat" mission when "email-urgency" is completed', async () => {
     const userDataWithEmailCompleted = {
       totalPoints: 100,
@@ -288,7 +285,7 @@ describe('Dashboard Component', () => {
       renderDashboard();
     });
     const insiderThreatCard = screen.getByTestId('mission-card-insider-threat');
-    // The MissionCard mock displays "Locked" if mission.locked is true and "Unlocked" otherwise.
+    // mission card shold be unlocked
     expect(insiderThreatCard).toHaveTextContent('Unlocked');
   });
 
@@ -323,7 +320,7 @@ describe('Dashboard Component', () => {
       renderDashboard();
     });
     expect(consoleErrorSpy).toHaveBeenCalledWith('Error fetching user data:', expect.any(Error));
-    // Ensure that the component is no longer in the loading state (i.e. main UI is rendered)
+    // check that the ui is rendered
     expect(screen.getByText('Select Role')).toBeInTheDocument();
     consoleErrorSpy.mockRestore();
   });

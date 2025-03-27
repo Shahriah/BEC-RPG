@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { BookOpen, X } from 'lucide-react';
 import InsiderThreatFeedbackModal from '../../components/insider-threat/InsiderThreatFeedbackModal';
 
-
+// mock lucide-react icons
 jest.mock('lucide-react', () => ({
   BookOpen: ({ className, ...props }) => (
     <svg data-testid="book-open-icon" className={className} {...props} />

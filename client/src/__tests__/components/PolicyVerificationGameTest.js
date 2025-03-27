@@ -84,14 +84,14 @@ describe('PolicyVerificationGame Component', () => {
     fireEvent.click(screen.getByText(/Start Training/i));
 
     
-    
+    // select all relevant policies
     const relevantPolicyTitles = [
       'Financial Approval Process',
       'Urgency Protocol',
       'Vendor Detail Changes',
       'Communication Channels'
     ];
-
+    // click each policy button
     relevantPolicyTitles.forEach(title => {
       const button = screen.getByText(new RegExp(title, 'i')).closest('button');
       fireEvent.click(button);

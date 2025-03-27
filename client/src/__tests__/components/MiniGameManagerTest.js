@@ -4,6 +4,7 @@ import '@testing-library/jest-dom';
 import MiniGameManager from '../../components/bec-security/MiniGameManager';
 
 
+// mock data for verification steps
 jest.mock('../../types/becSecurityTypes', () => {
   const mockVerificationGameType = {
     CHECK_SENDER: 'check_sender',
@@ -18,6 +19,7 @@ jest.mock('../../types/becSecurityTypes', () => {
   };
 
   const mockVerificationSteps = {
+    // define verification steps
     [mockVerificationGameType.CHECK_SENDER]: {
       id: 'check_sender',
       title: 'Check Sender Details',
@@ -52,6 +54,7 @@ jest.mock('../../types/becSecurityTypes', () => {
 });
 
 
+// mock lucide-react icons
 jest.mock('lucide-react', () => ({
   Trophy: jest.fn(() => <div data-testid="trophy-icon" />),
   ArrowRight: jest.fn(() => <div data-testid="arrow-right-icon" />)

@@ -26,7 +26,6 @@ const InsiderThreatGame = () => {
   // set states for the game
   const [startTime] = useState(Date.now());
   const [currentScenario, setCurrentScenario] = useState(0);
-  const [showTutorial, setShowTutorial] = useState(true);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [score, setScore] = useState(0);
@@ -200,91 +199,7 @@ const InsiderThreatGame = () => {
     );
   };
 
-  const renderTutorial = () => (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-4 overflow-hidden">
-        <div className="grid md:grid-cols-2">
-          {/* left side */}
-          <div className="bg-blue-600 text-white p-4 sm:p-8 flex flex-col justify-center">
-            <div className="mb-4 sm:mb-6">
-              <Users className="w-12 h-12 sm:w-16 sm:h-16 text-white mb-4" strokeWidth={1.5} />
-              <h2 className="text-2xl sm:text-3xl font-bold mb-4">Insider Threat Simulator</h2>
-            </div>
-            
-            <div className="space-y-3 sm:space-y-4">
-              <div className="flex items-start gap-2">
-                <Shield className="w-5 h-5 sm:w-6 sm:h-6 mt-1 flex-shrink-0" />
-                <div>
-                  <h3 className="font-semibold text-sm sm:text-base">Cybersecurity Challenge</h3>
-                  <p className="text-xs sm:text-sm text-blue-100">
-                    Develop critical skills in detecting and preventing insider threats.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-2">
-                <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 mt-1 flex-shrink-0" />
-                <div>
-                  <h3 className="font-semibold text-sm sm:text-base">Real-World Scenarios</h3>
-                  <p className="text-xs sm:text-sm text-blue-100">
-                    Experience authentic insider threat scenarios from different organizational roles.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-2">
-                <Info className="w-5 h-5 sm:w-6 sm:h-6 mt-1 flex-shrink-0" />
-                <div>
-                  <h3 className="font-semibold text-sm sm:text-base">Continuous Learning</h3>
-                  <p className="text-xs sm:text-sm text-blue-100">
-                    Gain insights into threat detection, pattern recognition, and security best practices.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* right side */}
-          <div className="p-4 sm:p-8">
-            <div className="mb-4">
-              <h3 className="text-xl sm:text-2xl font-bold mb-2">Your Mission: {roleName}</h3>
-              <p className="text-xs sm:text-sm text-gray-600 mb-4">
-                As a {roleName}, you are tasked with monitoring and investigating potential insider threats within your organization.
-              </p>
-              
-              <div className="bg-yellow-50 border-l-4 border-yellow-500 p-3 sm:p-4 mb-4">
-                <h4 className="font-semibold mb-1 text-sm sm:text-base">Mission Objectives</h4>
-                <ul className="list-disc list-inside space-y-1 text-xs sm:text-sm text-gray-700">
-                  <li>Analyze employee activity patterns</li>
-                  <li>Identify suspicious behavioral changes</li>
-                  <li>Protect organizational assets and information</li>
-                  <li>Make informed security decisions quickly</li>
-                </ul>
-              </div>
-              
-              <div className="bg-green-50 border-l-4 border-green-500 p-3 sm:p-4">
-                <h4 className="font-semibold mb-1 text-sm sm:text-base">Key Skills You'll Develop</h4>
-                <ul className="list-disc list-inside space-y-1 text-xs sm:text-sm text-gray-700">
-                  <li>Pattern recognition</li>
-                  <li>Contextual analysis</li>
-                  <li>Risk assessment</li>
-                  <li>Critical thinking under pressure</li>
-                </ul>
-              </div>
-            </div>
-            
-            <button
-              onClick={() => setShowTutorial(false)}
-              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 text-xs sm:text-sm"
-            >
-              <Play className="w-5 h-5" />
-              Begin Insider Threat Investigation
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+
 
   if (!roleScenarios || roleScenarios.length === 0) {
     return (
@@ -363,8 +278,6 @@ const InsiderThreatGame = () => {
             />
           )}
   
-          {/* show the tutorial */}
-          {showTutorial && renderTutorial()}
   
           {/* show the completion information */}
           {showCompletionModal && (

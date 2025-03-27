@@ -1,4 +1,3 @@
-// server/server.js
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -11,7 +10,7 @@ app.use(express.json());
 
 
 // MongoDB Atlas Connection String (replace with your connection string)
-const MONGODB_URI = "mongodb+srv://naimmiah34:Tanjiro-12@cluster0.rmljg.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const MONGODB_URI = process.env.MONGODB_URI;
 
 // Connect to MongoDB Atlas
 mongoose.connect(MONGODB_URI)

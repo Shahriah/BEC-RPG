@@ -22,7 +22,6 @@ const BECSecurityGame = () => {
   const navigate = useNavigate();
   const [startTime] = useState(Date.now());
   const [score, setScore] = useState(0);
-  const [showTutorial, setShowTutorial] = useState(true);
   const [showFeedback, setShowFeedback] = useState(false);
   const [verificationScores, setVerificationScores] = useState({});
   const [gamePhase, setGamePhase] = useState('verification');
@@ -152,92 +151,6 @@ const BECSecurityGame = () => {
     }
   };
 
-  const renderTutorial = () => (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-4 overflow-hidden">
-        <div className="grid md:grid-cols-2">
-          {/* left side */}
-          <div className="bg-blue-600 text-white p-8 flex flex-col justify-center">
-            <div className="mb-6">
-              <Mail className="w-16 h-16 text-white mb-4" strokeWidth={1.5} />
-              <h2 className="text-3xl font-bold mb-4">BEC Security Training</h2>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <Shield className="w-6 h-6 mt-1 flex-shrink-0" />
-                <div>
-                  <h3 className="font-semibold text-lg">Cybersecurity Challenge</h3>
-                  <p className="text-sm text-blue-100">
-                    Develop critical skills in identifying and mitigating Business Email Compromise (BEC) threats.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="w-6 h-6 mt-1 flex-shrink-0" />
-                <div>
-                  <h3 className="font-semibold text-lg">Real-World Scenarios</h3>
-                  <p className="text-sm text-blue-100">
-                    Experience authentic email security verification challenges across different organizational steps.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <Info className="w-6 h-6 mt-1 flex-shrink-0" />
-                <div>
-                  <h3 className="font-semibold text-lg">Continuous Learning</h3>
-                  <p className="text-sm text-blue-100">
-                    Gain insights into email verification, security protocols, and threat detection.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* right side */}
-          <div className="p-8">
-            <div className="mb-6">
-              <h3 className="text-2xl font-bold mb-2">Your Mission</h3>
-              <p className="text-gray-600 mb-4">
-                Navigate through critical verification steps to protect against Business Email Compromise (BEC) threats.
-              </p>
-              
-              <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4">
-                <h4 className="font-semibold mb-2">Mission Objectives</h4>
-                <ul className="list-disc list-inside space-y-2 text-sm text-gray-700">
-                  <li>Complete verification mini-games</li>
-                  <li>Identify suspicious email patterns</li>
-                  <li>Follow proper security escalation procedures</li>
-                  <li>Protect company assets from potential fraud</li>
-                </ul>
-              </div>
-              
-              <div className="bg-green-50 border-l-4 border-green-500 p-4">
-                <h4 className="font-semibold mb-2">Key Skills You'll Develop</h4>
-                <ul className="list-disc list-inside space-y-2 text-sm text-gray-700">
-                  <li>Email verification techniques</li>
-                  <li>Security protocol adherence</li>
-                  <li>Threat detection</li>
-                  <li>Incident response strategies</li>
-                </ul>
-              </div>
-            </div>
-            
-            <button
-              onClick={() => setShowTutorial(false)}
-              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-            >
-              <Play className="w-5 h-5" />
-              Begin BEC Security Investigation
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   const renderSecurityInsights = () => (
     <div className="space-y-6">
       <div className="bg-blue-50 p-6 rounded-lg">
@@ -353,7 +266,6 @@ const BECSecurityGame = () => {
           </div>
         </div>
 
-        {showTutorial && renderTutorial()}
 
         {showCompletionModal && gameStats && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center">

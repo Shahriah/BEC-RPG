@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import CheckSenderGame from '../../components/bec-security/CheckSenderGame';
 
+// mock lucide icons
 jest.mock('lucide-react', () => ({
   Mail: jest.fn(() => <div data-testid="mail-icon" />),
   AlertTriangle: jest.fn(() => <div data-testid="alert-triangle-icon" />),
@@ -14,7 +15,9 @@ jest.mock('lucide-react', () => ({
   AlertCircle: jest.fn(() => <div data-testid="alert-circle-icon" />)
 }));
 
+
 describe('CheckSenderGame Component', () => {
+  // mock email data
   const mockEmail = {
     from: 'test@example.com',
     subject: 'Urgent Financial Request',
@@ -23,7 +26,7 @@ describe('CheckSenderGame Component', () => {
   };
 
   const mockOnComplete = jest.fn();
-
+  // render component with props
   const renderComponent = (props = {}) => {
     const defaultProps = {
       email: mockEmail,

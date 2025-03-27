@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { AlertCircle, CheckCircle, HelpCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle, XCircle, Info, HelpCircle } from 'lucide-react';
 
 const InteractiveEmail = ({ email, onAnalysisComplete }) => {
   const [selectedFlags, setSelectedFlags] = useState(new Set());
@@ -8,73 +7,60 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
   const [showHints, setShowHints] = useState(false);
   const [analysisScore, setAnalysisScore] = useState(0);
 
-
   // this sets what is considered a red flag in an email
   const identifyRedFlags = (email) => {
     const redFlags = new Map();
 
+    // Create a map of suspicious words instead of phrases
+    // Each suspicious word is stored with its category and explanation
+    
     // domain name red flag
     if (!email.from.endsWith('@company.com')) {
-      redFlags.set('domain', {
-        text: email.from,
+      const domain = email.from.split('@')[1];
+      redFlags.set(domain, {
         category: 'Suspicious Domain',
         explanation: 'Email from unofficial or modified domain'
       });
     }
 
-    // email body red flags
-    const urgencyWords = ['urgent', 'asap', 'immediately', 'today', 'quick'];
+    // email body red flags - individual words
+    const urgencyWords = ['urgent', 'asap', 'immediately', 'today', 'quick', 'deadline', 'emergency'];
     urgencyWords.forEach(word => {
-      if (email.content.toLowerCase().includes(word)) {
-        redFlags.set('urgency', {
-          text: word,
+      if (email.content.toLowerCase().includes(word.toLowerCase())) {
+        redFlags.set(word, {
           category: 'Urgency Pressure',
           explanation: 'Creating time pressure to force quick action'
         });
       }
     });
 
-    // symbols for payments red flag
-    const moneyPattern = /\$[\d,]+(\.\d{2})?/g;
-    const moneyMatches = email.content.match(moneyPattern);
-    if (moneyMatches) {
-      redFlags.set('financial', {
-        text: moneyMatches[0],
-        category: 'Financial Request',
-        explanation: 'Suspicious payment or transfer request'
-      });
-    }
+    // financial words
+    const financialWords = ['dollars', 'payment', 'invoice', 'fund', 'transaction', 'transfer', 'money'];
+    financialWords.forEach(word => {
+      if (email.content.toLowerCase().includes(word.toLowerCase())) {
+        redFlags.set(word, {
+          category: 'Financial Request',
+          explanation: 'Suspicious payment or transfer request'
+        });
+      }
+    });
 
-    // secret phrases red flag
-    const secrecyPhrases = [
-      'confidential',
-      'don\'t discuss',
-      'only through this email',
-      'reply only',
-      'keep this private'
-    ];
-    secrecyPhrases.forEach(phrase => {
-      if (email.content.toLowerCase().includes(phrase)) {
-        redFlags.set('secrecy', {
-          text: phrase,
+    // secret words
+    const secrecyWords = ['confidential', 'secret', 'private', 'discreet', 'only', 'exclusively'];
+    secrecyWords.forEach(word => {
+      if (email.content.toLowerCase().includes(word.toLowerCase())) {
+        redFlags.set(word, {
           category: 'Communication Limitation',
           explanation: 'Attempting to limit verification channels'
         });
       }
     });
 
-    // banking phrases red flag
-    const bankingPhrases = [
-      'new account',
-      'update bank',
-      'change account',
-      'alternate account',
-      'banking issue'
-    ];
-    bankingPhrases.forEach(phrase => {
-      if (email.content.toLowerCase().includes(phrase)) {
-        redFlags.set('banking', {
-          text: phrase,
+    // banking words
+    const bankingWords = ['bank account', 'routing', 'credentials', 'details', 'password', 'login', 'social security'];
+    bankingWords.forEach(word => {
+      if (email.content.toLowerCase().includes(word.toLowerCase())) {
+        redFlags.set(word, {
           category: 'Account Changes',
           explanation: 'Suspicious request to modify payment details'
         });
@@ -86,31 +72,51 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
 
   const suspiciousElements = identifyRedFlags(email);
 
-  // this takes the number of red flags identified and calculates a score
   const calculateScore = () => {
-    let matchedCount = 0;
-    // iterate over each suspicious element only once
-    suspiciousElements.forEach((element) => {
-      // check if at least one selected flag matches this element
-      const isMatched = Array.from(selectedFlags).some(flag =>
-        flag.toLowerCase().includes(element.text.toLowerCase()) ||
-        element.text.toLowerCase().includes(flag.toLowerCase())
-      );
-      if (isMatched) {
-        matchedCount++;
+    let foundCorrectWords = 0;
+    let incorrectSelections = 0;
+    
+    // check each selected flag against our suspicious words list
+    selectedFlags.forEach(flag => {
+      // normalize the flag by removing punctuation and converting to lowercase
+      const normalizedFlag = flag.toLowerCase().trim().replace(/[.,!?]/g, '');
+      
+      // check if this exact word is in our suspicious elements
+      if (suspiciousElements.has(normalizedFlag)) {
+        foundCorrectWords++;
+      } else {
+        // check if this flag is part of any suspicious element key
+        const isPartOfSuspicious = Array.from(suspiciousElements.keys()).some(key => 
+          key.includes(normalizedFlag) || normalizedFlag.includes(key)
+        );
+        
+        if (isPartOfSuspicious) {
+          foundCorrectWords++;
+        } else {
+          incorrectSelections++;
+        }
       }
     });
-    const totalFlags = suspiciousElements.size;
-    return totalFlags > 0 ? Math.round((matchedCount / totalFlags) * 100) : 0;
+    
+    const totalSuspiciousWords = suspiciousElements.size;
+    
+    let score = 0;
+    if (totalSuspiciousWords > 0) {
+      score = Math.max(0, Math.round((foundCorrectWords / totalSuspiciousWords * 100) - (incorrectSelections * 3)));
+    }
+
+    console.log('Score:', score);
+    console.log('Found:', foundCorrectWords);
+    console.log('Incorrect:', incorrectSelections);
+    
+    return score;
   };
-  
-  // deals with what has been selected within the email analysis
+
   const handleWordClick = (word) => {
     if (showFeedback) return;
 
     setSelectedFlags(prev => {
       const newFlags = new Set(prev);
-      // checks if the words selected are within the red flags
       if (newFlags.has(word)) {
         newFlags.delete(word);
       } else {
@@ -120,7 +126,6 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
     });
   };
 
-  // this renders the content of the email
   const renderContent = (text) => {
     return text.split(' ').map((word, index) => (
       <span
@@ -133,13 +138,12 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
     ));
   };
 
-
-  // this is the function that handles the submission of the analysis
   const handleSubmitAnalysis = () => {
     const score = calculateScore();
     setAnalysisScore(score);
     setShowFeedback(true);
   };
+
 
   return (
     <div className="bg-white rounded-lg">

@@ -109,7 +109,7 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
      ]
    }
  ];
-// set up game logic ensuring payer is within time 
+// set up game logic ensuring player is within time 
  useEffect(() => {
    if (!gameState.showTutorial && !gameState.isComplete && gameState.timeRemaining > 0) {
      const timer = setInterval(() => {
@@ -170,18 +170,25 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
  const handleSubmit = () => {
   const currentStep = communicationSteps[gameState.currentStep];
   const correctOptions = currentStep.options.filter(opt => opt.correct);
+  
   // calculate step score based on selected options
   const selectedCorrect = gameState.selectedOptions.filter(id => 
     currentStep.options.find(opt => opt.id === id && opt.correct)
   ).length;
-  // penalize for selecting incorrect options
+  
   const selectedIncorrect = gameState.selectedOptions.filter(id => 
     currentStep.options.find(opt => opt.id === id && !opt.correct)
   ).length;
-  // calculate step score
-  const stepScore = Math.max(0, Math.min(100,
+  
+  // calculate basic step score
+  let stepScore = Math.max(0, Math.min(100,
     (selectedCorrect / correctOptions.length) * 100 - (selectedIncorrect * 25)
   ));
+  
+  // add time bonus (up to 20 additional points for quick responses)
+  const timeRemaining = gameState.timeRemaining;
+  const timeBonus = Math.floor((timeRemaining / 45) * 20); // 20 points max time bonus
+  stepScore = Math.min(100, stepScore + timeBonus);
 
   const stepSelection = {
     question: currentStep.question,
@@ -195,7 +202,9 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
   const newStepScores = [...gameState.stepScores, stepScore];
   const newStepSelections = [...gameState.stepSelections, stepSelection];
 
+  // update state or complete game based on current step
   if (gameState.currentStep < communicationSteps.length - 1) {
+    // move to next step
     setGameState(prev => ({
       ...prev,
       currentStep: prev.currentStep + 1,
@@ -207,6 +216,7 @@ const ContactSupervisorGame = ({ email, onComplete }) => {
     // calculate final score by averaging step scores
     const finalScore = Math.round(newStepScores.reduce((a, b) => a + b, 0) / communicationSteps.length);
     
+    // complete the game
     setGameState(prev => ({
       ...prev,
       isComplete: true,

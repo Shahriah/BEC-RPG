@@ -2,6 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { EmailViewer, ActionPanel, FeedbackPanel } from '../../components/bec-security/BecEmailViewer'; 
 
+
+// mock data types for testing
 jest.mock('../../types/becSecurityTypes', () => ({
   RedFlags: {},
   SecurityBehaviors: {
@@ -15,6 +17,7 @@ jest.mock('../../types/becSecurityTypes', () => ({
 }));
 
 afterEach(cleanup);
+
 
 describe('EmailViewer Component', () => {
   test('renders nothing when no email is provided', () => {
@@ -33,6 +36,7 @@ describe('EmailViewer Component', () => {
     };
 
     render(<EmailViewer email={email} />);
+    // expected email details
     expect(screen.getByText(/From: alice@example.com/i)).toBeInTheDocument();
     expect(screen.getByText(/Subject: Test Subject/i)).toBeInTheDocument();
     expect(screen.getByText(/2025-02-23 12:34/i)).toBeInTheDocument();
@@ -44,6 +48,7 @@ describe('ActionPanel Component', () => {
   test('renders main action buttons and calls onAction with correct values', () => {
     const onAction = jest.fn();
     const onVerify = jest.fn();
+    // render panel details
     render(
       <ActionPanel
         onAction={onAction}
@@ -58,6 +63,7 @@ describe('ActionPanel Component', () => {
     expect(flagButton).toBeInTheDocument();
     expect(processButton).toBeInTheDocument();
 
+    // click flag and process buttons
     fireEvent.click(flagButton);
     expect(onAction).toHaveBeenCalledWith('flag');
 

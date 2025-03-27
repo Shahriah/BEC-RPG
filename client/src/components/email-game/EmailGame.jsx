@@ -16,15 +16,16 @@ const EmailGame = () => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [showDetailedFeedbackModal, setShowDetailedFeedbackModal] = useState(false);
   const [gameStats, setGameStats] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
   const [analysisScore, setAnalysisScore] = useState(0);
   const [selectedFlags, setSelectedFlags] = useState([]);
-  const [showTutorial, setShowTutorial] = useState(true);
+  
+  // track scores for all scenarios
+  const [scenarioScores, setScenarioScores] = useState([]);
 
-
-
-  // retrieve scenaris for diferent, specified roles
+  // retrieve scenarios for different, specified roles
   const roleScenarios = EmailScenarios[roleId?.toUpperCase()] || [];
   const currentScenario = roleScenarios[currentScenarioIndex];
 
@@ -35,19 +36,30 @@ const EmailGame = () => {
     }
   }, [roleId, navigate]);
 
+  // calculate the average of all scenario scores
+  const calculateAverageScore = (scores) => {
+    if (scores.length === 0) return 0;
+    const sum = scores.reduce((total, score) => total + score.overall, 0);
+    return Math.round(sum / scores.length);
+  };
+
   const handleOptionSelect = async (option) => {
     setSelectedOption(option);
     setShowFeedback(true);
 
-    const totalScore = {
+    const scenarioScore = {
       analysis: analysisScore,
-      response: option.points
+      response: option.points,
+      overall: Math.round((analysisScore + option.points) / 2)
     };
 
-    // calculate final score dependent upon analysis and response scores
-    const finalScore = Math.round((totalScore.analysis + totalScore.response) / 2);
+    // update the array of scenario scores
+    const updatedScores = [...scenarioScores, scenarioScore];
+    setScenarioScores(updatedScores);
 
     if (currentScenarioIndex === roleScenarios.length - 1) {
+      const averageScore = calculateAverageScore(updatedScores);
+      
       // send api call to backend to save progress
       try {
         const response = await fetch('http://localhost:5000/api/missions/complete', {
@@ -58,7 +70,7 @@ const EmailGame = () => {
           body: JSON.stringify({
             username: 'testuser',
             missionId: 'email-urgency',
-            score: finalScore,
+            score: averageScore,
             timeSpent: Date.now() - startTime
           }),
         });
@@ -66,52 +78,69 @@ const EmailGame = () => {
         if (response.ok) {
           const data = await response.json();
           setGameStats({
-            analysisScore: totalScore.analysis,
-            responseScore: totalScore.response,
-            finalScore: finalScore,
+            currentScore: scenarioScore,
+            allScores: updatedScores,
+            averageScore: averageScore,
             timeSpent: Date.now() - startTime,
             pointsEarned: data.pointsEarned,
             totalPoints: data.totalPoints,
             newRank: data.rank
           });
-          setShowCompletionModal(true);
         }
       } catch (error) {
         console.error('Error saving progress:', error);
       }
     }
   };
-  const renderScoreFeedback = () => {
+
+  const renderDetailedFeedbackModal = () => {
+    if (!showDetailedFeedbackModal || !gameStats) return null;
+
     return (
-      <div className="bg-blue-50 rounded-lg p-4 mb-4">
-        <h3 className="font-semibold mb-2">Your Performance</h3>
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <span>Email Analysis:</span>
-            <span>{analysisScore}%</span>
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+        <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+          <div className="flex items-center gap-2 mb-4">
+            <Trophy className="w-8 h-8 text-yellow-500" />
+            <h2 className="text-2xl font-bold">Mission Performance</h2>
           </div>
-          <div className="flex justify-between">
-            <span>Response Choice:</span>
-            <span>{selectedOption.points}%</span>
-          </div>
-          <div className="flex justify-between font-semibold border-t pt-2">
-            <span>Overall Score:</span>
-            <span>{Math.round((analysisScore + selectedOption.points) / 2)}%</span>
+
+          <div className="space-y-4">
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h3 className="font-semibold text-lg mb-2">Your Results</h3>
+              <div className="space-y-2">
+                <p>Current Analysis Score: {gameStats.currentScore.analysis}%</p>
+                <p>Current Response Score: {gameStats.currentScore.response}%</p>
+                <p className="font-semibold text-blue-700">Average Score Across All Scenarios: {gameStats.averageScore}%</p>
+                <p>Time: {Math.round(gameStats.timeSpent / 1000)}s</p>
+                <p>Points Earned: {gameStats.pointsEarned}</p>
+                <p>New Rank: {gameStats.newRank}</p>
+              </div>
+            </div>
+
+            <div className="bg-green-50 p-4 rounded-lg">
+              <h3 className="font-semibold mb-2">Key Learning Points</h3>
+              <ul className="list-disc list-inside space-y-2 text-sm">
+                {currentScenario.educationalPoints.map((point, index) => (
+                  <li key={index}>{point}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setShowDetailedFeedbackModal(false);
+                  setShowCompletionModal(true);
+                }}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Continue
+              </button>
+            </div>
           </div>
         </div>
       </div>
     );
-  };
-
-
-  // restes all states to handle the next scenario
-  const handleNextScenario = () => {
-    setCurrentScenarioIndex(prev => prev + 1);
-    setSelectedOption(null);
-    setShowFeedback(false);
-    setShowOptions(false);
-    setAnalysisScore(0);
-    setSelectedFlags([]); 
   };
 
   const renderCompletionModal = () => {
@@ -127,12 +156,19 @@ const EmailGame = () => {
 
           <div className="space-y-4">
             <div className="bg-blue-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-lg mb-2">Your Results</h3>
+              <h3 className="font-semibold text-lg mb-2">Final Mission Summary</h3>
               <div className="space-y-2">
-                <p>Analysis Score: {analysisScore}%</p>
-                <p>Response Score: {gameStats.score}%</p>
-                <p>Time: {Math.round(gameStats.timeSpent / 1000)}s</p>
-                <p>Points Earned: {gameStats.pointsEarned}</p>
+                {gameStats.allScores.map((score, index) => (
+                  <div key={index} className="flex justify-between text-sm">
+                    <span>Scenario {index + 1}:</span>
+                    <span>{score.overall}%</span>
+                  </div>
+                ))}
+                <div className="border-t pt-2 mt-2 font-bold flex justify-between">
+                  <span>Average Score:</span>
+                  <span>{gameStats.averageScore}%</span>
+                </div>
+                <p>Total Points Earned: {gameStats.pointsEarned}</p>
                 <p>New Rank: {gameStats.newRank}</p>
               </div>
             </div>
@@ -156,91 +192,38 @@ const EmailGame = () => {
       </div>
     );
   };
-  const renderTutorial = () => (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-4 overflow-hidden">
-        <div className="grid md:grid-cols-2">
-          {/* left side */}
-          <div className="bg-blue-600 text-white p-8 flex flex-col justify-center">
-            <div className="mb-6">
-              <Mail className="w-16 h-16 text-white mb-4" strokeWidth={1.5} />
-              <h2 className="text-3xl font-bold mb-4">Email Security Simulator</h2>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <Shield className="w-6 h-6 mt-1 flex-shrink-0" />
-                <div>
-                  <h3 className="font-semibold text-lg">Cybersecurity Challenge</h3>
-                  <p className="text-sm text-blue-100">
-                    Develop critical skills in identifying and mitigating Business Email Compromise (BEC) threats.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="w-6 h-6 mt-1 flex-shrink-0" />
-                <div>
-                  <h3 className="font-semibold text-lg">Real-World Scenarios</h3>
-                  <p className="text-sm text-blue-100">
-                    Experience authentic email security challenges from different organizational roles.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <Info className="w-6 h-6 mt-1 flex-shrink-0" />
-                <div>
-                  <h3 className="font-semibold text-lg">Continuous Learning</h3>
-                  <p className="text-sm text-blue-100">
-                    Gain insights into email threat detection, social engineering, and security best practices.
-                  </p>
-                </div>
-              </div>
-            </div>
+
+  const renderScoreFeedback = () => {
+    return (
+      <div className="bg-blue-50 rounded-lg p-4 mb-4">
+        <h3 className="font-semibold mb-2">Your Performance</h3>
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <span>Email Analysis:</span>
+            <span>{analysisScore}%</span>
           </div>
-          
-          {/*right side */}
-          <div className="p-8">
-            <div className="mb-6">
-              <h3 className="text-2xl font-bold mb-2">Your Mission: {roleName}</h3>
-              <p className="text-gray-600 mb-4">
-                As a {roleName}, you are tasked with identifying and responding to potential Business Email Compromise (BEC) threats.
-              </p>
-              
-              <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4">
-                <h4 className="font-semibold mb-2">Mission Objectives</h4>
-                <ul className="list-disc list-inside space-y-2 text-sm text-gray-700">
-                  <li>Analyze email content for suspicious elements</li>
-                  <li>Identify social engineering tactics</li>
-                  <li>Protect organizational communication channels</li>
-                  <li>Make informed security decisions quickly</li>
-                </ul>
-              </div>
-              
-              <div className="bg-green-50 border-l-4 border-green-500 p-4">
-                <h4 className="font-semibold mb-2">Key Skills You'll Develop</h4>
-                <ul className="list-disc list-inside space-y-2 text-sm text-gray-700">
-                  <li>Threat detection</li>
-                  <li>Critical email analysis</li>
-                  <li>Incident response</li>
-                  <li>Social engineering awareness</li>
-                </ul>
-              </div>
-            </div>
-            
-            <button
-              onClick={() => setShowTutorial(false)}
-              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-            >
-              <Play className="w-5 h-5" />
-              Begin Email Security Investigation
-            </button>
+          <div className="flex justify-between">
+            <span>Response Choice:</span>
+            <span>{selectedOption.points}%</span>
+          </div>
+          <div className="flex justify-between font-semibold border-t pt-2">
+            <span>Overall Score:</span>
+            <span>{Math.round((analysisScore + selectedOption.points) / 2)}%</span>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
+
+  // restes all states to handle the next scenario
+  const handleNextScenario = () => {
+    setCurrentScenarioIndex(prev => prev + 1);
+    setSelectedOption(null);
+    setShowFeedback(false);
+    setShowOptions(false);
+    setAnalysisScore(0);
+    setSelectedFlags([]); 
+  };
 
   if (!currentScenario) {
     return null;
@@ -257,9 +240,7 @@ const EmailGame = () => {
           <ArrowLeft className="w-4 h-4" />
           Back to Missions
         </button>
-        {showTutorial && renderTutorial()}
 
-  
         {/* header */}
         <div className="bg-white rounded-lg shadow-lg p-4">
           <div className="flex items-center gap-2 mb-2">
@@ -273,13 +254,13 @@ const EmailGame = () => {
             </p>
           </div>
         </div>
-  
+
         {/* information on scenario */}
         <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
           <h2 className="font-semibold mb-2">{currentScenario.title}</h2>
           <p className="text-gray-700">{currentScenario.context}</p>
         </div>
-  
+
         {/* objectives */}
         <div className="bg-green-50 border border-green-100 rounded-lg p-4">
           <h3 className="font-semibold mb-2 flex items-center gap-2">
@@ -295,8 +276,8 @@ const EmailGame = () => {
             ))}
           </ul>
         </div>
-  
-        {/* alays displaying email */}
+
+        {/* always displaying email */}
         <div className="bg-white rounded-lg shadow-lg p-6">
           <div className="font-mono text-sm border rounded p-4 mb-4">
             <div><strong>From:</strong> {currentScenario.initialSituation.from}</div>
@@ -304,7 +285,7 @@ const EmailGame = () => {
             <div><strong>Time:</strong> {currentScenario.initialSituation.timestamp}</div>
             <div className="mt-4 whitespace-pre-wrap">{currentScenario.initialSituation.content}</div>
           </div>
-  
+
           {!showOptions ? (
             <>
               <div className="mb-4">
@@ -315,7 +296,7 @@ const EmailGame = () => {
                   Click on any suspicious elements in the email that could indicate a Business Email Compromise attempt.
                 </p>
               </div>
-  
+
               <InteractiveEmail
                 email={currentScenario.initialSituation}
                 onAnalysisComplete={(accuracy) => {
@@ -334,7 +315,7 @@ const EmailGame = () => {
                   Based on your analysis, select the most appropriate response to this situation.
                 </p>
               </div>
-  
+
               <div className="space-y-2">
                 {currentScenario.options.map((option, index) => (
                   <button
@@ -365,12 +346,12 @@ const EmailGame = () => {
             </div>
           )}
         </div>
-  
+
         {/* immediate feedback section */}
         {showFeedback && (
           <div className="space-y-4">
             {renderScoreFeedback()}
-  
+
             <div className={`p-4 rounded-lg ${
               selectedOption.correct ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
             }`}>
@@ -379,7 +360,7 @@ const EmailGame = () => {
               </div>
               <p className="text-gray-700">{selectedOption.feedback}</p>
             </div>
-  
+
             {currentScenarioIndex < roleScenarios.length - 1 ? (
               <button
                 onClick={handleNextScenario}
@@ -389,15 +370,18 @@ const EmailGame = () => {
               </button>
             ) : (
               <button
-                onClick={() => setShowCompletionModal(true)}
+                onClick={() => setShowDetailedFeedbackModal(true)}
                 className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
               >
-                Complete Mission
+                View Performance
               </button>
             )}
           </div>
         )}
-  
+
+        {/* detailed feedback modal */}
+        {renderDetailedFeedbackModal()}
+
         {/* completion pop up */}
         {renderCompletionModal()}
       </div>

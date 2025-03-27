@@ -34,7 +34,7 @@ describe('ChoiceSelector Component', () => {
     option2: { value: 'value2', label: 'Option 2', description: 'Description 2' },
   };
 
-  
+  // DummyIcon component for testing
   const DummyIcon = () => <svg data-testid="dummy-icon" />;
 
   test('renders title and options correctly', () => {
@@ -108,6 +108,7 @@ describe('ChoiceSelector Component', () => {
 });
 
 describe('FeedbackPanel Component', () => {
+  // choice setting
   const choices = {
     classification: 'option1',
     access: 'optionA',

@@ -4,7 +4,7 @@ import { act } from 'react-dom/test-utils';
 import '@testing-library/jest-dom';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 
-
+// mock data for scenarios 
 jest.mock('../../data/insiderThreatScenarios', () => ({
   InsiderScenarios: {
     IT: [
@@ -17,7 +17,8 @@ jest.mock('../../data/insiderThreatScenarios', () => ({
             employee: 'John Doe',
             department: 'IT',
             details: 'Unusual login activity',
-            icon: jest.fn(),
+            // provide a simple icon component for rendering
+            icon: () => <div data-testid="activity-icon" />,
             timeline: [{ isNormal: false }]
           }
         ]
@@ -33,7 +34,6 @@ jest.mock('../../data/insiderThreatEducation', () => ({
   }))
 }));
 
-
 jest.mock('../../components/insider-threat/TimelineAnalysisView', () => {
   return jest.fn(() => <div data-testid="timeline-analysis-view">Mocked Timeline View</div>);
 });
@@ -46,10 +46,9 @@ jest.mock('../../components/insider-threat/InsiderThreatFeedbackModal', () => {
   ));
 });
 
-
 import InsiderThreatGame from '../../components/insider-threat/InsiderThreatGame';
 
-
+// mock fetch API
 global.fetch = jest.fn(() =>
   Promise.resolve({
     ok: true,
@@ -57,13 +56,12 @@ global.fetch = jest.fn(() =>
   })
 );
 
-
 Object.defineProperty(window, 'location', {
   value: { reload: jest.fn() },
   writable: true
 });
 
-
+// helper function to render component with routing
 const renderComponent = (initialEntries = ['/game'], locationState = {}) => {
   const entries = initialEntries.map((path) => ({ pathname: path, state: locationState }));
   return render(
@@ -76,14 +74,6 @@ const renderComponent = (initialEntries = ['/game'], locationState = {}) => {
   );
 };
 
-
-const dismissTutorial = async () => {
-  const beginButton = await screen.findByRole('button', {
-    name: /Begin Insider Threat Investigation/i,
-  });
-  fireEvent.click(beginButton);
-};
-
 describe('InsiderThreatGame Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -94,7 +84,6 @@ describe('InsiderThreatGame Component', () => {
     jest.useRealTimers();
   });
 
-  
   describe('Routing and Initialization', () => {
     test('redirects to dashboard when no role is provided', async () => {
       renderComponent(['/game']);
@@ -107,80 +96,56 @@ describe('InsiderThreatGame Component', () => {
       renderComponent(['/game'], { roleId: 'IT', roleName: 'IT Security' });
       
       await waitFor(() => {
-        expect(screen.getByText(/Insider Threat Simulator/i)).toBeInTheDocument();
-      });
-      
-      await dismissTutorial();
-      await waitFor(() => {
-        
         expect(screen.getByText(/Insider Threat Monitor/i)).toBeInTheDocument();
-        expect(screen.getByText(/IT Security Scenario/i)).toBeInTheDocument();
-      });
-    });
-
-    test('displays tutorial modal on initial render', async () => {
-      renderComponent(['/game'], { roleId: 'IT', roleName: 'IT Security' });
-      await waitFor(() => {
-        expect(screen.getByText(/Insider Threat Simulator/i)).toBeInTheDocument();
-        expect(screen.getByText(/Begin Insider Threat Investigation/i)).toBeInTheDocument();
+        expect(screen.getByText(/Role: IT Security - IT Security Scenario/i)).toBeInTheDocument();
+        expect(screen.getByText('Test IT scenario description')).toBeInTheDocument();
       });
     });
   });
 
-
-
-  
   describe('Game Progression', () => {
-    beforeEach(async () => {
+    beforeEach(() => {
       renderComponent(['/game'], { roleId: 'IT', roleName: 'IT Security' });
-      await dismissTutorial();
     });
 
     test('completes scenario when activities are investigated', async () => {
-      
       await waitFor(() => {
         const flagButton = screen.getByRole('button', { name: /Flag Suspicious/i });
         fireEvent.click(flagButton);
       });
 
-      
       act(() => {
         jest.advanceTimersByTime(1000);
       });
 
-      
       await waitFor(() => {
         expect(screen.getByText(/Mission Complete!/i)).toBeInTheDocument();
       });
     });
 
     test('calculates final score', async () => {
-      
       await waitFor(() => {
         const flagButton = screen.getByRole('button', { name: /Flag Suspicious/i });
         fireEvent.click(flagButton);
       });
 
       act(() => {
+        // advance timer to complete scenario
         jest.advanceTimersByTime(1000);
       });
 
-      
       await waitFor(() => {
         expect(screen.getByText(/Final Score:/i)).toBeInTheDocument();
       });
     });
   });
 
-  
   describe('Navigation', () => {
-    beforeEach(async () => {
+    beforeEach(() => {
       renderComponent(['/game'], { roleId: 'IT', roleName: 'IT Security' });
-      await dismissTutorial();
     });
 
-    test('returns to dashboard', async () => {
-      
+    test('returns to dashboard when Back to Missions is clicked', async () => {
       await waitFor(() => {
         const backButton = screen.getByRole('button', { name: /Back to Missions/i });
         fireEvent.click(backButton);
@@ -188,18 +153,17 @@ describe('InsiderThreatGame Component', () => {
 
       expect(screen.getByText('Dashboard')).toBeInTheDocument();
     });
-
   });
 
-  
   describe('Error Handling', () => {
     test('handles no scenarios', async () => {
-      
       const insiderScenarios = require('../../data/insiderThreatScenarios').InsiderScenarios;
       insiderScenarios.IT = [];
 
       renderComponent(['/game'], { roleId: 'IT', roleName: 'IT Security' });
-      expect(screen.getByText(/No Scenarios Available/i)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText(/No Scenarios Available/i)).toBeInTheDocument();
+      });
     });
   });
 });

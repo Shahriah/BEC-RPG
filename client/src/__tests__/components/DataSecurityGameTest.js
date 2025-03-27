@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import DataSecurityGame from '../../components/data-security/DataSecurityGame';
@@ -11,7 +10,7 @@ jest.mock('react-router-dom', () => ({
   MemoryRouter: ({ children }) => <div>{children}</div>,
 }));
 
-
+// mock DataSecurityScenarioCard component
 jest.mock('../../components/data-security/DataSecurityScenarioCard', () => ({
   ScenarioCard: ({ scenario }) => (
     <div data-testid="scenario-card">{scenario.question}</div>
@@ -34,8 +33,9 @@ jest.mock('../../components/data-security/DataSecurityScenarioCard', () => ({
   ),
 }));
 
-
 jest.mock('../../data/dataSecurityScenarios', () => ({
+
+  // mock scenarios
   scenarios: [
     {
       question: 'Test Scenario 1',
@@ -52,7 +52,6 @@ jest.mock('../../data/dataSecurityScenarios', () => ({
   ],
 }));
 
-
 jest.mock('../../types/dataSecurityTypes', () => ({
   DataClassification: ['Option1', 'Option2'],
   AccessLevels: ['OptionA', 'OptionB'],
@@ -64,31 +63,26 @@ describe('DataSecurityGame Component', () => {
     jest.clearAllMocks();
   });
 
-  test('renders initial UI with tutorial modal', () => {
+  test('renders initial UI correctly', () => {
     render(
       <MemoryRouter>
         <DataSecurityGame />
       </MemoryRouter>
     );
-    
-    expect(screen.getByText('Begin Data Security Investigation')).toBeInTheDocument();
-    expect(screen.getByText('Your Mission')).toBeInTheDocument();
-    
-    expect(
-      screen.getByRole('heading', { name: 'Data Guardian', level: 1 })
-    ).toBeInTheDocument();
-    expect(screen.getByText('Score: 0')).toBeInTheDocument();
-  });
 
-  test('hides tutorial modal after clicking begin button', () => {
-    render(
-      <MemoryRouter>
-        <DataSecurityGame />
-      </MemoryRouter>
-    );
-    const beginButton = screen.getByText('Begin Data Security Investigation');
-    fireEvent.click(beginButton);
-    expect(screen.queryByText('Your Mission')).not.toBeInTheDocument();
+    // check header and score
+    expect(screen.getByRole('heading', { name: /Data Guardian/i })).toBeInTheDocument();
+    expect(screen.getByText('Score: 0')).toBeInTheDocument();
+
+    // check that the first scenario is displayed
+    expect(screen.getByTestId('scenario-card')).toHaveTextContent('Test Scenario 1');
+
+    // check that the ChoiceSelectors render their labels
+    expect(screen.getByText('Data Classification')).toBeInTheDocument();
+    expect(screen.getByText('Access Level')).toBeInTheDocument();
+    expect(screen.getByText('Security Measures')).toBeInTheDocument();
+
+    expect(screen.getByRole('button', { name: /Submit Decisions/i })).toBeDisabled();
   });
 
   test('navigates back to missions when Back to Missions button is clicked', () => {
@@ -108,18 +102,17 @@ describe('DataSecurityGame Component', () => {
         <DataSecurityGame />
       </MemoryRouter>
     );
-    fireEvent.click(screen.getByText('Begin Data Security Investigation'));
 
     const submitButton = screen.getByRole('button', { name: /Submit Decisions/i });
     expect(submitButton).toBeDisabled();
 
-    fireEvent.click(screen.getByText('Option1'));
+    fireEvent.click(screen.getByText('Option1')); // For Data Classification
     expect(submitButton).toBeDisabled();
 
-    fireEvent.click(screen.getByText('OptionA'));
+    fireEvent.click(screen.getByText('OptionA')); // For Access Level
     expect(submitButton).toBeDisabled();
 
-    fireEvent.click(screen.getByText('OptionX'));
+    fireEvent.click(screen.getByText('OptionX')); // For Security Measures
     expect(submitButton).not.toBeDisabled();
   });
 
@@ -129,7 +122,6 @@ describe('DataSecurityGame Component', () => {
         <DataSecurityGame />
       </MemoryRouter>
     );
-    fireEvent.click(screen.getByText('Begin Data Security Investigation'));
 
     fireEvent.click(screen.getByText('Option1'));
     fireEvent.click(screen.getByText('OptionA'));
@@ -149,8 +141,8 @@ describe('DataSecurityGame Component', () => {
         <DataSecurityGame />
       </MemoryRouter>
     );
-    fireEvent.click(screen.getByText('Begin Data Security Investigation'));
 
+    // complete first scenario
     fireEvent.click(screen.getByText('Option1'));
     fireEvent.click(screen.getByText('OptionA'));
     fireEvent.click(screen.getByText('OptionX'));
@@ -159,6 +151,7 @@ describe('DataSecurityGame Component', () => {
     await waitFor(() => screen.getByTestId('feedback-panel'));
     fireEvent.click(screen.getByRole('button', { name: /Next/i }));
 
+    // the ScenarioCard should now show the second scenario's question
     expect(screen.getByTestId('scenario-card')).toHaveTextContent('Test Scenario 2');
 
     const progressBar = document.querySelector('div.bg-blue-600');
@@ -180,8 +173,7 @@ describe('DataSecurityGame Component', () => {
         <DataSecurityGame />
       </MemoryRouter>
     );
-    fireEvent.click(screen.getByText('Begin Data Security Investigation'));
-
+    // scneario 1
     fireEvent.click(screen.getByText('Option1'));
     fireEvent.click(screen.getByText('OptionA'));
     fireEvent.click(screen.getByText('OptionX'));
@@ -189,7 +181,8 @@ describe('DataSecurityGame Component', () => {
 
     await waitFor(() => screen.getByTestId('feedback-panel'));
     fireEvent.click(screen.getByRole('button', { name: /Next/i }));
-
+    
+    // scenario 2
     fireEvent.click(screen.getByText('Option2'));
     fireEvent.click(screen.getByText('OptionB'));
     fireEvent.click(screen.getByText('OptionY'));
@@ -209,11 +202,11 @@ describe('DataSecurityGame Component', () => {
         <DataSecurityGame />
       </MemoryRouter>
     );
-    fireEvent.click(screen.getByText('Begin Data Security Investigation'));
 
     let progressBar = container.querySelector('div.bg-blue-600');
     expect(progressBar).toHaveStyle('width: 50%');
 
+    // complete first scenario to move to the next
     fireEvent.click(screen.getByText('Option1'));
     fireEvent.click(screen.getByText('OptionA'));
     fireEvent.click(screen.getByText('OptionX'));

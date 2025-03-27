@@ -7,6 +7,7 @@ jest.mock('lucide-react', () => ({
 }));
 
 describe('AchievementBanner Component', () => {
+  // set default values
   const defaultProps = {
     achieved: 3,
     total: 5
@@ -46,6 +47,7 @@ describe('AchievementBanner Component', () => {
     const { container } = render(<AchievementBanner {...defaultProps} />);
     
     const banner = container.firstChild;
+    // check for color gradient, border, and rounded corners
     expect(banner).toHaveClass(
       'bg-gradient-to-r',
       'from-yellow-50',
@@ -55,6 +57,7 @@ describe('AchievementBanner Component', () => {
       'rounded-lg'
     );
     
+    // check for icons
     const trophyContainer = screen.getByTestId('trophy-icon').parentElement;
     expect(trophyContainer).toHaveClass('flex', 'items-center', 'gap-3');
 

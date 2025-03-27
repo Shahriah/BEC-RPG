@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import ContactSupervisorGame from '../../components/bec-security/ContactSupervisorGame';
-import { VerificationGameType } from '../../types/becSecurityTypes';
 
+// set up test email
 const mockEmail = {
   from: 'test@example.com',
   subject: 'Urgent Request',
@@ -27,8 +27,6 @@ describe('ContactSupervisorGame Component', () => {
     jest.clearAllMocks();
   });
 
-
-
   describe('Tutorial Rendering', () => {
     test('renders tutorial initially', () => {
       renderComponent();
@@ -41,7 +39,7 @@ describe('ContactSupervisorGame Component', () => {
       ).toBeInTheDocument();
     });
 
-    test('dismisses tutorial on clicking Start Training', async () => {
+    test('dismisses tutorial when clicking Start Training', async () => {
       renderComponent();
       const startButton = screen.getByRole('button', { name: /Start Training/i });
       fireEvent.click(startButton);
@@ -60,8 +58,6 @@ describe('ContactSupervisorGame Component', () => {
         expect(screen.getByRole('button', { name: /Next Step/i })).toBeInTheDocument()
       );
     });
-
-
 
     test('renders all option buttons for the current step', () => {
       expect(
@@ -121,6 +117,7 @@ describe('ContactSupervisorGame Component', () => {
   });
 
   describe('Final Feedback', () => {
+    // high score selections for each step
     const highScoreSelections = {
       step0: [
         /Unusual urgency and pressure tactics/i,
@@ -140,6 +137,7 @@ describe('ContactSupervisorGame Component', () => {
 
     beforeEach(async () => {
       renderComponent();
+      // complete the training with high score selections
       fireEvent.click(screen.getByRole('button', { name: /Start Training/i }));
       for (const optionRegex of highScoreSelections.step0) {
         fireEvent.click(screen.getByRole('button', { name: optionRegex }));
@@ -173,13 +171,13 @@ describe('ContactSupervisorGame Component', () => {
       ).toBeInTheDocument();
     });
 
-    test('calls onComplete with correct parameters when Complete Training is clicked', async () => {
+    test('calls onComplete with final score when Complete Training is clicked', async () => {
       fireEvent.click(screen.getByRole('button', { name: /Complete Training/i }));
       await waitFor(() => {
         expect(mockOnComplete).toHaveBeenCalled();
       });
-      expect(mockOnComplete.mock.calls[0][0]).toBe(VerificationGameType.CONTACT_SUPERVISOR);
-      expect(typeof mockOnComplete.mock.calls[0][1]).toBe('number');
+      // expect the onComplete callback to be called with one parameter which is the number
+      expect(typeof mockOnComplete.mock.calls[0][0]).toBe('number');
     });
   });
 
@@ -198,7 +196,7 @@ describe('ContactSupervisorGame Component', () => {
       act(() => {
         jest.advanceTimersByTime(45000);
       });
-      // Expect the step to auto-submit and advance to step 2.
+      // expect the step to auto-submit and advance to step 2 out of step 3
       await waitFor(() =>
         expect(screen.getByText(/Step\s*2\s*of\s*3/i)).toBeInTheDocument()
       );
