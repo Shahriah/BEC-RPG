@@ -2,30 +2,6 @@
 
 An interactive cybersecurity training platform focused on Business Email Compromise (BEC) awareness through gamification.
 
-## Features
-
-- 🎮 **Four Interactive Training Modules**:
-  - Email Urgency Detection
-  - Insider Threat Detection  
-  - Business Email Security
-  - Data Security Protocol
-  
-- 👤 **Role-Based Training**:
-  - CEO
-  - Finance Department
-  - IT Security
-  - HR Manager
-  
-- 📊 **Progress Tracking**:
-  - Points system
-  - Rank progression
-  - Achievement tracking
-  
-- 🎯 **Gamified Learning**:
-  - Real-time feedback
-  - Interactive simulations
-  - Multi-step verification challenges
-
 ## System Requirements
 
 - Node.js (v14.0.0+)
