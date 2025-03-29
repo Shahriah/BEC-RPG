@@ -226,6 +226,7 @@ const Dashboard = () => {
                     <AchievementBanner
                         achieved={userData.achievements?.length || 0}
                         total={5}
+                        rank={userData.rank}
                     />
                 </main>
             </div>

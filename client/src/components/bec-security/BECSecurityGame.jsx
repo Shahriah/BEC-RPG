@@ -205,7 +205,7 @@ const BECSecurityGame = () => {
     <div className="min-h-screen bg-slate-100 p-4">
       <div className="max-w-4xl mx-auto">
         <button 
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/dashboard')}
           className="flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-4"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -299,7 +299,7 @@ const BECSecurityGame = () => {
 
                 <div className="flex gap-2">
                   <button
-                    onClick={() => navigate('/')}
+                    onClick={() => navigate('/dashboard')}
                     className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
                     Return to Missions

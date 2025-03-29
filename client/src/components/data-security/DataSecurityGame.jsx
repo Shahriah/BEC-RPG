@@ -105,7 +105,7 @@ const DataSecurityGame = () => {
       <div className="max-w-4xl w-full mx-auto">
         {/* button to take you back to home */}
         <button 
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/dashboard')}
           className="flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-4"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -199,7 +199,9 @@ const DataSecurityGame = () => {
               correctChoices={scenarios[currentScenario].correctChoices}
               explanations={scenarios[currentScenario].explanation}
               securityTips={scenarios[currentScenario].securityTips}
-              onNext={currentScenario < scenarios.length - 1 ? handleNextScenario : () => setShowCompletionModal(true)}
+              onNext={currentScenario < scenarios.length - 1 ? handleNextScenario : () => {
+                setTimeout(() => setShowCompletionModal(true), 100);
+              }}
             />
           )}
         </div>
@@ -227,7 +229,7 @@ const DataSecurityGame = () => {
      
              <div className="flex gap-2 mt-6">
                <button
-                 onClick={() => navigate('/')}
+                 onClick={() => navigate('/dashboard')}
                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                >
                  Return to Missions

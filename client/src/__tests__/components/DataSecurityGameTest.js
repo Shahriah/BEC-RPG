@@ -10,7 +10,7 @@ jest.mock('react-router-dom', () => ({
   MemoryRouter: ({ children }) => <div>{children}</div>,
 }));
 
-// mock DataSecurityScenarioCard component
+// mock the DataSecurityScenarioCard module
 jest.mock('../../components/data-security/DataSecurityScenarioCard', () => ({
   ScenarioCard: ({ scenario }) => (
     <div data-testid="scenario-card">{scenario.question}</div>
@@ -18,7 +18,7 @@ jest.mock('../../components/data-security/DataSecurityScenarioCard', () => ({
   ChoiceSelector: ({ title, selected, onChange, options, disabled }) => (
     <div>
       <label>{title}</label>
-      {options.map(option => (
+      {options.map((option) => (
         <button key={option} onClick={() => onChange(option)} disabled={disabled}>
           {option}
         </button>
@@ -34,8 +34,6 @@ jest.mock('../../components/data-security/DataSecurityScenarioCard', () => ({
 }));
 
 jest.mock('../../data/dataSecurityScenarios', () => ({
-
-  // mock scenarios
   scenarios: [
     {
       question: 'Test Scenario 1',
@@ -70,18 +68,19 @@ describe('DataSecurityGame Component', () => {
       </MemoryRouter>
     );
 
-    // check header and score
+    // Check header and initial score
     expect(screen.getByRole('heading', { name: /Data Guardian/i })).toBeInTheDocument();
     expect(screen.getByText('Score: 0')).toBeInTheDocument();
 
-    // check that the first scenario is displayed
+    // Verify the first scenario is displayed
     expect(screen.getByTestId('scenario-card')).toHaveTextContent('Test Scenario 1');
 
-    // check that the ChoiceSelectors render their labels
+    // Check that the ChoiceSelectors render their labels
     expect(screen.getByText('Data Classification')).toBeInTheDocument();
     expect(screen.getByText('Access Level')).toBeInTheDocument();
     expect(screen.getByText('Security Measures')).toBeInTheDocument();
 
+    // Submit button should be disabled until all choices are selected
     expect(screen.getByRole('button', { name: /Submit Decisions/i })).toBeDisabled();
   });
 
@@ -93,7 +92,7 @@ describe('DataSecurityGame Component', () => {
     );
     const backButton = screen.getByRole('button', { name: /Back to Missions/i });
     fireEvent.click(backButton);
-    expect(mockNavigate).toHaveBeenCalledWith('/');
+    expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
   });
 
   test('submit button is disabled until all choices are selected', () => {
@@ -102,10 +101,10 @@ describe('DataSecurityGame Component', () => {
         <DataSecurityGame />
       </MemoryRouter>
     );
-
     const submitButton = screen.getByRole('button', { name: /Submit Decisions/i });
     expect(submitButton).toBeDisabled();
 
+    // Simulate selecting each choice one-by-one
     fireEvent.click(screen.getByText('Option1')); // For Data Classification
     expect(submitButton).toBeDisabled();
 
@@ -123,6 +122,7 @@ describe('DataSecurityGame Component', () => {
       </MemoryRouter>
     );
 
+    // Select choices for the first scenario
     fireEvent.click(screen.getByText('Option1'));
     fireEvent.click(screen.getByText('OptionA'));
     fireEvent.click(screen.getByText('OptionX'));
@@ -130,6 +130,7 @@ describe('DataSecurityGame Component', () => {
     const submitButton = screen.getByRole('button', { name: /Submit Decisions/i });
     fireEvent.click(submitButton);
 
+    // Wait for the feedback panel to appear
     await waitFor(() => {
       expect(screen.getByTestId('feedback-panel')).toBeInTheDocument();
     });
@@ -142,18 +143,20 @@ describe('DataSecurityGame Component', () => {
       </MemoryRouter>
     );
 
-    // complete first scenario
+    // Complete first scenario
     fireEvent.click(screen.getByText('Option1'));
     fireEvent.click(screen.getByText('OptionA'));
     fireEvent.click(screen.getByText('OptionX'));
     fireEvent.click(screen.getByRole('button', { name: /Submit Decisions/i }));
 
+    // Wait for the feedback panel and then click Next
     await waitFor(() => screen.getByTestId('feedback-panel'));
     fireEvent.click(screen.getByRole('button', { name: /Next/i }));
 
-    // the ScenarioCard should now show the second scenario's question
+    // Verify the second scenario is now displayed
     expect(screen.getByTestId('scenario-card')).toHaveTextContent('Test Scenario 2');
 
+    // Check that the progress bar shows 100%
     const progressBar = document.querySelector('div.bg-blue-600');
     expect(progressBar).toHaveStyle('width: 100%');
   });
@@ -173,7 +176,7 @@ describe('DataSecurityGame Component', () => {
         <DataSecurityGame />
       </MemoryRouter>
     );
-    // scneario 1
+    // Scenario 1
     fireEvent.click(screen.getByText('Option1'));
     fireEvent.click(screen.getByText('OptionA'));
     fireEvent.click(screen.getByText('OptionX'));
@@ -182,12 +185,13 @@ describe('DataSecurityGame Component', () => {
     await waitFor(() => screen.getByTestId('feedback-panel'));
     fireEvent.click(screen.getByRole('button', { name: /Next/i }));
     
-    // scenario 2
+    // Scenario 2 (last scenario)
     fireEvent.click(screen.getByText('Option2'));
     fireEvent.click(screen.getByText('OptionB'));
     fireEvent.click(screen.getByText('OptionY'));
     fireEvent.click(screen.getByRole('button', { name: /Submit Decisions/i }));
 
+    // Wait for the completion modal to appear
     await waitFor(() => {
       expect(screen.getByText('Mission Complete!')).toBeInTheDocument();
       expect(screen.getByText(/Final Score:/i)).toBeInTheDocument();
@@ -203,16 +207,18 @@ describe('DataSecurityGame Component', () => {
       </MemoryRouter>
     );
 
+    // Initially, with 2 scenarios, the progress bar should be 50%
     let progressBar = container.querySelector('div.bg-blue-600');
     expect(progressBar).toHaveStyle('width: 50%');
 
-    // complete first scenario to move to the next
+    // Complete the first scenario and move to the next
     fireEvent.click(screen.getByText('Option1'));
     fireEvent.click(screen.getByText('OptionA'));
     fireEvent.click(screen.getByText('OptionX'));
     fireEvent.click(screen.getByRole('button', { name: /Submit Decisions/i }));
     fireEvent.click(screen.getByRole('button', { name: /Next/i }));
 
+    // Now the progress bar should be at 100%
     progressBar = container.querySelector('div.bg-blue-600');
     expect(progressBar).toHaveStyle('width: 100%');
   });

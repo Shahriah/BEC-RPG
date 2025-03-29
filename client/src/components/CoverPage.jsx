@@ -8,7 +8,12 @@ import {
   Info
 } from 'lucide-react';
 
+import { useNavigate } from 'react-router-dom';
+ 
+
 const CoverPage = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-slate-100 p-6">
       <div className="max-w-4xl mx-auto">
@@ -150,7 +155,7 @@ const CoverPage = () => {
         {/* start button */}
         <div className="mt-6 text-center">
         <button 
-            onClick={() => window.location.href = '/dashboard'}
+            onClick={() => navigate('/dashboard')}
             className="px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700"
             >
             Start Training

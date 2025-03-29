@@ -31,20 +31,29 @@ const ProgressCard = ({ progress, points }) => {
         </div>
       </div>
       
-      {/* progress bar */}
+      {/* progress bar showing progress to next rank */}
       <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
         <div 
           className="bg-blue-600 h-3 rounded-full transition-all duration-300"
-          style={{ width: `${progress}%` }}
+          style={{ 
+            width: nextRank.threshold 
+              ? `${Math.min(100, (points / nextRank.threshold) * 100)}%` 
+              : '100%' 
+          }}
         />
       </div>
       
-      {/* details about progress which calculates points to next rank */}
+      {/* details about progress to next rank */}
       <div className="flex flex-col sm:flex-row justify-between mt-2 text-xs sm:text-sm text-gray-600">
-        <span>{Math.round(progress)}% Missions Complete</span>
+        <span>
+          {nextRank.threshold 
+            ? `${Math.round((points / nextRank.threshold) * 100)}% to ${nextRank.rank}`
+            : 'Maximum Rank Achieved'
+          }
+        </span>
         {nextRank.threshold && (
           <span>
-            {nextRank.threshold - points} points to {nextRank.rank}
+            {nextRank.threshold - points} points needed
           </span>
         )}
       </div>

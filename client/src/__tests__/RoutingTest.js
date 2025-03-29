@@ -3,6 +3,10 @@ import { render, screen, cleanup } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../App';
 
+// Mock CoverPage since "/" now renders CoverPage
+jest.mock('../components/CoverPage', () => () => (
+  <div data-testid="cover-page">Cover Page Mock</div>
+));
 jest.mock('../components/Dashboard', () => () => (
   <div data-testid="dashboard">Dashboard Mock</div>
 ));
@@ -37,8 +41,13 @@ describe('Routing Integration', () => {
     );
   };
 
-  test('routing to root shows Dashboard', () => {
+  test('routing to root shows Cover Page', () => {
     renderWithRouter('/');
+    expect(screen.getByTestId('cover-page')).toBeInTheDocument();
+  });
+
+  test('routing to dashboard shows Dashboard', () => {
+    renderWithRouter('/dashboard');
     expect(screen.getByTestId('dashboard')).toBeInTheDocument();
   });
 
@@ -62,9 +71,9 @@ describe('Routing Integration', () => {
     expect(screen.getByTestId('data-game')).toBeInTheDocument();
   });
 
-  test('routing to invalid path redirects to Dashboard', () => {
+  test('routing to invalid path redirects to Cover Page', () => {
     renderWithRouter('/invalid-path');
-    expect(screen.getByTestId('dashboard')).toBeInTheDocument();
+    expect(screen.getByTestId('cover-page')).toBeInTheDocument();
   });
 
   test('handles routes with query parameters', () => {

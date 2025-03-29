@@ -3,6 +3,9 @@ import { render, screen, cleanup } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../App';
 
+jest.mock('../components/CoverPage', () => () => (
+  <div data-testid="cover-page">Cover Page Mock</div>
+));
 jest.mock('../components/Dashboard', () => () => (
   <div data-testid="dashboard">Dashboard Mock</div>
 ));
@@ -25,7 +28,7 @@ jest.mock('react-router-dom', () => ({
 }));
 
 describe('App Component', () => {
-  const renderWithRouter = (initialEntries = ['/', '/game/email']) => {
+  const renderWithRouter = (initialEntries = ['/']) => {
     return render(
       <MemoryRouter initialEntries={initialEntries}>
         <App />
@@ -33,9 +36,9 @@ describe('App Component', () => {
     );
   };
 
-  test('renders Dashboard at root route', () => {
+  test('renders CoverPage at root route', () => {
     renderWithRouter(['/']);
-    expect(screen.getByTestId('dashboard')).toBeInTheDocument();
+    expect(screen.getByTestId('cover-page')).toBeInTheDocument();
   });
 
   test('renders game components at their routes', () => {
@@ -55,8 +58,8 @@ describe('App Component', () => {
     expect(screen.getByTestId('data-game')).toBeInTheDocument();
   });
 
-  test('redirects to Dashboard for invalid routes', () => {
+  test('redirects to CoverPage for invalid routes', () => {
     renderWithRouter(['/invalid-route']);
-    expect(screen.getByTestId('dashboard')).toBeInTheDocument();
+    expect(screen.getByTestId('cover-page')).toBeInTheDocument();
   });
 });

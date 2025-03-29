@@ -9,108 +9,115 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
 
   // this sets what is considered a red flag in an email
   const identifyRedFlags = (email) => {
-    const redFlags = new Map();
-
-    // Create a map of suspicious words instead of phrases
-    // Each suspicious word is stored with its category and explanation
+    const suspiciousWords = new Map();
     
-    // domain name red flag
+    // Domain check
     if (!email.from.endsWith('@company.com')) {
       const domain = email.from.split('@')[1];
-      redFlags.set(domain, {
+      suspiciousWords.set(domain, {
         category: 'Suspicious Domain',
-        explanation: 'Email from unofficial or modified domain'
+        explanation: 'Email from unofficial domain'
       });
     }
-
-    // email body red flags - individual words
-    const urgencyWords = ['urgent', 'asap', 'immediately', 'today', 'quick', 'deadline', 'emergency'];
-    urgencyWords.forEach(word => {
-      if (email.content.toLowerCase().includes(word.toLowerCase())) {
-        redFlags.set(word, {
-          category: 'Urgency Pressure',
-          explanation: 'Creating time pressure to force quick action'
+  
+    const suspiciousPatterns = [
+      // urgency patterns
+      { words: ['urgent', 'immediate', 'quickly', 'asap', 'critical', 'emergency', 'hours', 'today'], 
+        category: 'Urgency Pressure' },
+      
+      // financial terms
+      { words: ['payment', 'wire', 'bank', 'transfer', 'escrow', 'account', 'funds', 'invoice'], 
+        category: 'Financial Request' },
+      
+      // secrecy patterns
+      { words: ['confidential', 'only', 'secret', 'private', 'discreet', 'confirm only via this email'], 
+        category: 'Communication Limitation' },
+      
+      // action requests
+      { words: ['proceed', 'approve', 'agreement', 'preliminary', 'action'], 
+        category: 'Action Request' }
+    ];
+    
+    // lowercase the entire content for easier checking
+    const content = email.content.toLowerCase();
+    
+    // check for each pattern
+    suspiciousPatterns.forEach(pattern => {
+      pattern.words.forEach(word => {
+        // check if the word exists in the content
+        if (content.includes(word.toLowerCase())) {
+          suspiciousWords.set(word, {
+            category: pattern.category,
+            explanation: `Potentially suspicious ${pattern.category.toLowerCase()}`
+          });
+        }
+      });
+    });
+    
+    const phrases = [
+      { phrase: "confirm only via this email", category: "Communication Limitation" },
+      { phrase: "within 2 hours", category: "Urgency Pressure" }
+    ];
+    
+    phrases.forEach(({ phrase, category }) => {
+      if (content.includes(phrase.toLowerCase())) {
+        suspiciousWords.set(phrase, {
+          category,
+          explanation: `Suspicious communication pattern`
         });
       }
     });
-
-    // financial words
-    const financialWords = ['dollars', 'payment', 'invoice', 'fund', 'transaction', 'transfer', 'money'];
-    financialWords.forEach(word => {
-      if (email.content.toLowerCase().includes(word.toLowerCase())) {
-        redFlags.set(word, {
-          category: 'Financial Request',
-          explanation: 'Suspicious payment or transfer request'
-        });
-      }
-    });
-
-    // secret words
-    const secrecyWords = ['confidential', 'secret', 'private', 'discreet', 'only', 'exclusively'];
-    secrecyWords.forEach(word => {
-      if (email.content.toLowerCase().includes(word.toLowerCase())) {
-        redFlags.set(word, {
-          category: 'Communication Limitation',
-          explanation: 'Attempting to limit verification channels'
-        });
-      }
-    });
-
-    // banking words
-    const bankingWords = ['bank account', 'routing', 'credentials', 'details', 'password', 'login', 'social security'];
-    bankingWords.forEach(word => {
-      if (email.content.toLowerCase().includes(word.toLowerCase())) {
-        redFlags.set(word, {
-          category: 'Account Changes',
-          explanation: 'Suspicious request to modify payment details'
-        });
-      }
-    });
-
-    return redFlags;
+    
+    console.log("Identified suspicious elements:", Array.from(suspiciousWords.keys()));
+    
+    return suspiciousWords;
   };
 
   const suspiciousElements = identifyRedFlags(email);
 
-  const calculateScore = () => {
-    let foundCorrectWords = 0;
-    let incorrectSelections = 0;
+const calculateScore = () => {
+  const suspiciousElements = identifyRedFlags(email);
+  console.log(suspiciousElements);
+  
+  let foundCorrectWords = 0;
+  let incorrectSelections = 0;
+  
+  // convert selected flags to an array
+  const selectedFlagsArray = Array.from(selectedFlags);
+  
+  // for each selection the user made
+  selectedFlagsArray.forEach(flag => {
+    const normalizedFlag = flag.toLowerCase().trim().replace(/[.,!?]/g, '');
     
-    // check each selected flag against our suspicious words list
-    selectedFlags.forEach(flag => {
-      // normalize the flag by removing punctuation and converting to lowercase
-      const normalizedFlag = flag.toLowerCase().trim().replace(/[.,!?]/g, '');
-      
-      // check if this exact word is in our suspicious elements
-      if (suspiciousElements.has(normalizedFlag)) {
-        foundCorrectWords++;
-      } else {
-        // check if this flag is part of any suspicious element key
-        const isPartOfSuspicious = Array.from(suspiciousElements.keys()).some(key => 
-          key.includes(normalizedFlag) || normalizedFlag.includes(key)
-        );
-        
-        if (isPartOfSuspicious) {
-          foundCorrectWords++;
-        } else {
-          incorrectSelections++;
-        }
-      }
-    });
-    
-    const totalSuspiciousWords = suspiciousElements.size;
-    
-    let score = 0;
-    if (totalSuspiciousWords > 0) {
-      score = Math.max(0, Math.round((foundCorrectWords / totalSuspiciousWords * 100) - (incorrectSelections * 3)));
+    // check if the user's selection is in the suspicious elements list
+    if (suspiciousElements.has(normalizedFlag)) {
+      foundCorrectWords++;
+      console.log(`Found match: ${normalizedFlag}`);
+    } else {
+      // if we get here, the user selected something that's not suspicious
+      incorrectSelections++;
+      console.log(`Incorrect selection: ${normalizedFlag}`);
     }
-
-    console.log('Score:', score);
-    console.log('Found:', foundCorrectWords);
-    console.log('Incorrect:', incorrectSelections);
+  });
+  
+  const totalSuspiciousWords = suspiciousElements.size;
+  
+  // simple scoring formula based on percentage found
+  let score = 0;
+  if (totalSuspiciousWords > 0) {
+    score = Math.round((foundCorrectWords / totalSuspiciousWords) * 100);
     
-    return score;
-  };
+    score = Math.max(0, score - (incorrectSelections * 2));
+  }
+  
+  console.log('score calculation:');
+  console.log('total suspicious elements:', totalSuspiciousWords);
+  console.log('found correct elements:', foundCorrectWords);
+  console.log('incorrect selections:', incorrectSelections);
+  console.log('final score:', score);
+  
+  return score;
+}
 
   const handleWordClick = (word) => {
     if (showFeedback) return;
@@ -143,7 +150,6 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
     setAnalysisScore(score);
     setShowFeedback(true);
   };
-
 
   return (
     <div className="bg-white rounded-lg">
@@ -231,24 +237,27 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
                   <span className="text-blue-800">Your Score:</span>
                   <span className="text-2xl font-bold text-blue-700">{analysisScore}%</span>
                 </div>
-                <div className="text-sm text-blue-600">
-                  You found {selectedFlags.size} suspicious elements
-                </div>
               </div>
             </div>
 
             {/* red flags found */}
             <div className="bg-red-50 rounded-lg p-4">
-              <h3 className="font-semibold mb-2 text-red-800">Red Flags Found:</h3>
-              <ul className="space-y-1">
-                {Array.from(selectedFlags).map((flag, index) => (
+            <h3 className="font-semibold mb-2 text-red-800">Red Flags Found:</h3>
+            <ul className="space-y-1">
+              {Array.from(selectedFlags)
+                .filter(flag => {
+                  const suspiciousElements = identifyRedFlags(email);
+                  const normalizedFlag = flag.toLowerCase().trim().replace(/[.,!?]/g, '');
+                  return suspiciousElements.has(normalizedFlag);
+                })
+                .map((flag, index) => (
                   <li key={index} className="text-sm text-red-700 flex items-center gap-2">
                     <AlertCircle className="w-4 h-4" />
                     {flag}
                   </li>
                 ))}
-              </ul>
-            </div>
+            </ul>
+          </div>
 
             <button
               onClick={() => onAnalysisComplete(analysisScore)}

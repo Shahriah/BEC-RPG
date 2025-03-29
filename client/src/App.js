@@ -11,8 +11,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/intro" element={<CoverPage />} />
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<CoverPage />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/game/email" element={<EmailGame />} />
         <Route path="/game/bec-security" element={<BECSecurityGame />} />
         <Route path="/game/insider-threat" element={<InsiderThreatGame />} />

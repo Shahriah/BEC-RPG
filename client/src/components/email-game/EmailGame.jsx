@@ -175,7 +175,7 @@ const EmailGame = () => {
 
             <div className="flex gap-2 mt-6">
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/dashboard')}
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 Return to Missions
@@ -234,7 +234,7 @@ const EmailGame = () => {
       <div className="max-w-4xl mx-auto space-y-4">
         {/* redirect to home */}
         <button 
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/dashboard')}
           className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
         >
           <ArrowLeft className="w-4 h-4" />

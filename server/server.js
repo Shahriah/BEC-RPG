@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
@@ -12,12 +11,12 @@ app.use(express.json());
 // MongoDB Atlas Connection String (replace with your connection string)
 const MONGODB_URI = process.env.MONGODB_URI;
 
-// Connect to MongoDB Atlas
+// connect to MongoDB Atlas
 mongoose.connect(MONGODB_URI)
   .then(() => console.log('Successfully connected to MongoDB Atlas!'))
   .catch((error) => console.error('Error connecting to MongoDB:', error));
 
-// Create User Schema
+// create user 
 const userSchema = new mongoose.Schema({
   username: { 
     type: String, 
@@ -26,7 +25,7 @@ const userSchema = new mongoose.Schema({
   },
   totalPoints: { 
     type: Number, 
-    default: 0 
+    default: 450 
   },
   rank: { 
     type: String, 
@@ -48,12 +47,12 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
-// Routes
+// routes
 app.get("/api/test", (req, res) => {
   res.json({ message: "Backend is connected!" });
 });
 
-// Create or get user
+// create or get user
 app.post('/api/users', async (req, res) => {
   try {
     const { username } = req.body;
@@ -70,7 +69,7 @@ app.post('/api/users', async (req, res) => {
   }
 });
 
-// Get user data
+// get user data
 app.get('/api/users/:username', async (req, res) => {
   try {
     const user = await User.findOne({ username: req.params.username });
@@ -83,7 +82,7 @@ app.get('/api/users/:username', async (req, res) => {
   }
 });
 
-// Complete mission
+// complete mission
 app.post('/api/missions/complete', async (req, res) => {
   try {
     const { username, missionId, score, timeSpent } = req.body;
@@ -93,10 +92,10 @@ app.post('/api/missions/complete', async (req, res) => {
       user = new User({ username });
     }
 
-    // Calculate points
+    // calculate points
     const pointsEarned = Math.floor(score + (1000 / timeSpent));
 
-    // Update mission progress
+    // update mission progress
     const missionIndex = user.missions.findIndex(m => m.missionId === missionId);
     if (missionIndex === -1) {
       user.missions.push({
@@ -118,10 +117,10 @@ app.post('/api/missions/complete', async (req, res) => {
       }
     }
 
-    // Update total points
+    // update total points
     user.totalPoints += pointsEarned;
 
-    // Update rank based on total points
+    // update rank based on total points
     if (user.totalPoints >= 5000) user.rank = 'Cyber Master';
     else if (user.totalPoints >= 3000) user.rank = 'Security Expert';
     else if (user.totalPoints >= 1500) user.rank = 'Defender';
@@ -142,10 +141,10 @@ app.post('/api/missions/complete', async (req, res) => {
 
 app.post('/api/users/reset', async (req, res) => {
   try {
-    // Reset user data to initial state
+    // reset user data to initial state
     await User.updateMany({}, {
       $set: {
-        totalPoints: 0,
+        totalPoints: 450,
         rank: 'Rookie',
         missions: [],
         achievements: []
@@ -164,7 +163,7 @@ app.listen(PORT, () => {
 });
 
 app.use(cors({
-    origin: "*", // Allow all domains for testing, but restrict this in production
+    origin: "*", 
     methods: "GET,POST,PUT,DELETE",
     allowedHeaders: "Content-Type,Authorization"
 }));

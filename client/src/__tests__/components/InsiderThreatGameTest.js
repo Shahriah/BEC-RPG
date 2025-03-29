@@ -68,6 +68,7 @@ const renderComponent = (initialEntries = ['/game'], locationState = {}) => {
     <MemoryRouter initialEntries={entries} initialIndex={0}>
       <Routes>
         <Route path="/game" element={<InsiderThreatGame />} />
+        <Route path="/dashboard" element={<div>Dashboard</div>} />
         <Route path="/" element={<div>Dashboard</div>} />
       </Routes>
     </MemoryRouter>
@@ -109,6 +110,7 @@ describe('InsiderThreatGame Component', () => {
     });
 
     test('completes scenario when activities are investigated', async () => {
+      // wait for the Flag Suspicious button and click it.
       await waitFor(() => {
         const flagButton = screen.getByRole('button', { name: /Flag Suspicious/i });
         fireEvent.click(flagButton);
@@ -124,13 +126,14 @@ describe('InsiderThreatGame Component', () => {
     });
 
     test('calculates final score', async () => {
+      // Click the Flag Suspicious button to trigger investigation.
       await waitFor(() => {
         const flagButton = screen.getByRole('button', { name: /Flag Suspicious/i });
         fireEvent.click(flagButton);
       });
 
       act(() => {
-        // advance timer to complete scenario
+        // Advance timer to allow the end-of-scenario processing.
         jest.advanceTimersByTime(1000);
       });
 
