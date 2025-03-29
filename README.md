@@ -48,6 +48,7 @@ An interactive cybersecurity training platform focused on Business Email Comprom
 
 Run test coverage in either directory:
 ```
+cd client
 npm run test:coverage
 ```
 
