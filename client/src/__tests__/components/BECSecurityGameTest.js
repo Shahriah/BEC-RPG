@@ -77,7 +77,7 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-describe('Additional tests for BECSecurityGame uncovered lines', () => {
+describe('Additional Action Tests', () => {
   test('handleAction with incorrect action computes a lower score and shows feedback', async () => {
     render(<BECSecurityGame />);
     fireEvent.click(screen.getByText(/Complete Verification/i));

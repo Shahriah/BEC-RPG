@@ -313,7 +313,7 @@ describe('Dashboard Component', () => {
     expect(dataSecurityCard).toHaveTextContent('Unlocked');
   });
 
-  test('handles fetch rejection gracefully', async () => {
+  test('handles fetch rejection ', async () => {
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     global.fetch = jest.fn(() => Promise.reject(new Error('Network error')));
     await act(async () => {

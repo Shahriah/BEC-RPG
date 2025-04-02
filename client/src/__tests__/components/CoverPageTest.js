@@ -3,7 +3,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import CoverPage from '../../components/CoverPage';
 import { MemoryRouter, useNavigate } from 'react-router-dom';
 
-// Mock useNavigate from react-router-dom
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: jest.fn(),
@@ -59,7 +58,7 @@ describe('CoverPage Component', () => {
       </MemoryRouter>
     );
 
-    // Check for roles and achievements headings
+    // check for roles and achievements headings
     expect(
       screen.getByRole('heading', { name: /Role Selection/i })
     ).toBeInTheDocument();
@@ -67,13 +66,13 @@ describe('CoverPage Component', () => {
       screen.getByRole('heading', { name: /Achievements/i })
     ).toBeInTheDocument();
 
-    // Check for available roles
+    // check for available roles
     expect(screen.getByText(/CEO:/i)).toBeInTheDocument();
     expect(screen.getByText(/Finance:/i)).toBeInTheDocument();
     expect(screen.getByText(/IT Security:/i)).toBeInTheDocument();
     expect(screen.getByText(/HR:/i)).toBeInTheDocument();
 
-    // Check for rank progression
+    // check for rank progression
     expect(screen.getByText(/Rookie:/i)).toBeInTheDocument();
     expect(screen.getByText(/Cyber Master:/i)).toBeInTheDocument();
   });

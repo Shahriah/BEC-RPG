@@ -68,19 +68,18 @@ describe('DataSecurityGame Component', () => {
       </MemoryRouter>
     );
 
-    // Check header and initial score
+    // check header and initial score
     expect(screen.getByRole('heading', { name: /Data Guardian/i })).toBeInTheDocument();
     expect(screen.getByText('Score: 0')).toBeInTheDocument();
 
-    // Verify the first scenario is displayed
+    // verify the first scenario is displayed
     expect(screen.getByTestId('scenario-card')).toHaveTextContent('Test Scenario 1');
 
-    // Check that the ChoiceSelectors render their labels
     expect(screen.getByText('Data Classification')).toBeInTheDocument();
     expect(screen.getByText('Access Level')).toBeInTheDocument();
     expect(screen.getByText('Security Measures')).toBeInTheDocument();
 
-    // Submit button should be disabled until all choices are selected
+    // submit button should be disabled until all choices are selected
     expect(screen.getByRole('button', { name: /Submit Decisions/i })).toBeDisabled();
   });
 
@@ -104,14 +103,14 @@ describe('DataSecurityGame Component', () => {
     const submitButton = screen.getByRole('button', { name: /Submit Decisions/i });
     expect(submitButton).toBeDisabled();
 
-    // Simulate selecting each choice one-by-one
-    fireEvent.click(screen.getByText('Option1')); // For Data Classification
+    // simulate selecting each choice one-by-one
+    fireEvent.click(screen.getByText('Option1')); 
     expect(submitButton).toBeDisabled();
 
-    fireEvent.click(screen.getByText('OptionA')); // For Access Level
+    fireEvent.click(screen.getByText('OptionA')); 
     expect(submitButton).toBeDisabled();
 
-    fireEvent.click(screen.getByText('OptionX')); // For Security Measures
+    fireEvent.click(screen.getByText('OptionX')); 
     expect(submitButton).not.toBeDisabled();
   });
 
@@ -122,7 +121,7 @@ describe('DataSecurityGame Component', () => {
       </MemoryRouter>
     );
 
-    // Select choices for the first scenario
+    // select choices for the first scenario
     fireEvent.click(screen.getByText('Option1'));
     fireEvent.click(screen.getByText('OptionA'));
     fireEvent.click(screen.getByText('OptionX'));
@@ -130,7 +129,7 @@ describe('DataSecurityGame Component', () => {
     const submitButton = screen.getByRole('button', { name: /Submit Decisions/i });
     fireEvent.click(submitButton);
 
-    // Wait for the feedback panel to appear
+    // wait for the feedback panel to appear
     await waitFor(() => {
       expect(screen.getByTestId('feedback-panel')).toBeInTheDocument();
     });
@@ -143,20 +142,17 @@ describe('DataSecurityGame Component', () => {
       </MemoryRouter>
     );
 
-    // Complete first scenario
+    // complete first scenario
     fireEvent.click(screen.getByText('Option1'));
     fireEvent.click(screen.getByText('OptionA'));
     fireEvent.click(screen.getByText('OptionX'));
     fireEvent.click(screen.getByRole('button', { name: /Submit Decisions/i }));
 
-    // Wait for the feedback panel and then click Next
     await waitFor(() => screen.getByTestId('feedback-panel'));
     fireEvent.click(screen.getByRole('button', { name: /Next/i }));
 
-    // Verify the second scenario is now displayed
     expect(screen.getByTestId('scenario-card')).toHaveTextContent('Test Scenario 2');
 
-    // Check that the progress bar shows 100%
     const progressBar = document.querySelector('div.bg-blue-600');
     expect(progressBar).toHaveStyle('width: 100%');
   });
@@ -176,7 +172,6 @@ describe('DataSecurityGame Component', () => {
         <DataSecurityGame />
       </MemoryRouter>
     );
-    // Scenario 1
     fireEvent.click(screen.getByText('Option1'));
     fireEvent.click(screen.getByText('OptionA'));
     fireEvent.click(screen.getByText('OptionX'));
@@ -185,13 +180,11 @@ describe('DataSecurityGame Component', () => {
     await waitFor(() => screen.getByTestId('feedback-panel'));
     fireEvent.click(screen.getByRole('button', { name: /Next/i }));
     
-    // Scenario 2 (last scenario)
     fireEvent.click(screen.getByText('Option2'));
     fireEvent.click(screen.getByText('OptionB'));
     fireEvent.click(screen.getByText('OptionY'));
     fireEvent.click(screen.getByRole('button', { name: /Submit Decisions/i }));
 
-    // Wait for the completion modal to appear
     await waitFor(() => {
       expect(screen.getByText('Mission Complete!')).toBeInTheDocument();
       expect(screen.getByText(/Final Score:/i)).toBeInTheDocument();
@@ -207,18 +200,15 @@ describe('DataSecurityGame Component', () => {
       </MemoryRouter>
     );
 
-    // Initially, with 2 scenarios, the progress bar should be 50%
     let progressBar = container.querySelector('div.bg-blue-600');
     expect(progressBar).toHaveStyle('width: 50%');
 
-    // Complete the first scenario and move to the next
     fireEvent.click(screen.getByText('Option1'));
     fireEvent.click(screen.getByText('OptionA'));
     fireEvent.click(screen.getByText('OptionX'));
     fireEvent.click(screen.getByRole('button', { name: /Submit Decisions/i }));
     fireEvent.click(screen.getByRole('button', { name: /Next/i }));
 
-    // Now the progress bar should be at 100%
     progressBar = container.querySelector('div.bg-blue-600');
     expect(progressBar).toHaveStyle('width: 100%');
   });

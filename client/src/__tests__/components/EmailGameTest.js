@@ -69,34 +69,28 @@ describe('EmailGame Component', () => {
     }));
   });
   
-  // Helper function now accepts a flag to optionally complete the full modal flow.
+  // helper function now accepts a flag to optionally complete the full modal flow.
   const completeGameFlow = async (fullFlow = true) => {
-    // Step 1: Submit analysis.
     const submitButton = screen.getByText(/Submit Analysis/i);
     fireEvent.click(submitButton);
     
-    // Wait for the response options to be rendered.
     await waitFor(() => {
       expect(screen.getByText('Option 1')).toBeInTheDocument();
     });
     
-    // Step 2: Click the correct option.
     fireEvent.click(screen.getByText('Option 1'));
     
-    // For tests expecting full flow (i.e. detailed feedback and completion modal)
     if (fullFlow) {
       await waitFor(() => {
         expect(screen.getByText('View Performance')).toBeInTheDocument();
       });
       
-      // Step 3: Click "View Performance" to open detailed feedback modal.
       fireEvent.click(screen.getByText('View Performance'));
       
       await waitFor(() => {
         expect(screen.getByText('Continue')).toBeInTheDocument();
       });
       
-      // Step 4: Click "Continue" to show completion modal.
       fireEvent.click(screen.getByText('Continue'));
     }
   };
@@ -109,7 +103,7 @@ describe('EmailGame Component', () => {
 
   test('completes game flow and shows completion modal', async () => {
     render(<EmailGame />);
-    await completeGameFlow(); // fullFlow = true by default
+    await completeGameFlow();
 
     await waitFor(() => {
       expect(screen.getByText('Mission Complete!')).toBeInTheDocument();
@@ -138,12 +132,11 @@ describe('EmailGame Component', () => {
     expect(mockReload).toHaveBeenCalled();
   });
   
-  test('handles API errors gracefully', async () => {
+  test('handles API errors', async () => {
     global.fetch.mockRejectedValueOnce(new Error('API Error'));
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   
     render(<EmailGame />);
-    // Use completeGameFlow with fullFlow set to false so that we don't wait for the modal steps.
     await completeGameFlow(false);
   
     await waitFor(() => {

@@ -11,7 +11,6 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
   const identifyRedFlags = (email) => {
     const suspiciousWords = new Map();
     
-    // Domain check
     if (!email.from.endsWith('@company.com')) {
       const domain = email.from.split('@')[1];
       suspiciousWords.set(domain, {
@@ -67,9 +66,7 @@ const InteractiveEmail = ({ email, onAnalysisComplete }) => {
         });
       }
     });
-    
-    console.log("Identified suspicious elements:", Array.from(suspiciousWords.keys()));
-    
+        
     return suspiciousWords;
   };
 
@@ -109,12 +106,6 @@ const calculateScore = () => {
     
     score = Math.max(0, score - (incorrectSelections * 2));
   }
-  
-  console.log('score calculation:');
-  console.log('total suspicious elements:', totalSuspiciousWords);
-  console.log('found correct elements:', foundCorrectWords);
-  console.log('incorrect selections:', incorrectSelections);
-  console.log('final score:', score);
   
   return score;
 }
@@ -187,7 +178,7 @@ const calculateScore = () => {
         </div>
       </div>
 
-      {/* Controls and Feedback */}
+      {/* controls and feedback */}
       <div className="space-y-4">
         {!showFeedback ? (
           <>

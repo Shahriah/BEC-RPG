@@ -3,7 +3,6 @@ import { render, screen, cleanup } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../App';
 
-// Mock CoverPage since "/" now renders CoverPage
 jest.mock('../components/CoverPage', () => () => (
   <div data-testid="cover-page">Cover Page Mock</div>
 ));
