@@ -14,6 +14,8 @@ An interactive cybersecurity training platform focused on Business Email Comprom
 
 1. Clone the repository:
    ```
+   If you have downloaded from zip, then access main file location in terminal.
+   Otherwise:
    git clone https://github.com/Shahriah/BEC-RPG.git
    cd BEC-RPG
    ```
